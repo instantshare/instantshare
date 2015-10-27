@@ -1,13 +1,8 @@
 # https://github.com/chriskiehl/pyrobot
-# started from Audionautics code on http://stackoverflow.com/questions/3585293/pil-imagegrab-fails-on-2nd-virtual-monitor-of-virtualbox
+# started from Audionautics code on
+# http://stackoverflow.com/questions/3585293/pil-imagegrab-fails-on-2nd-virtual-monitor-of-virtualbox
 # updated for PILLOW and Python 3 by Alan Baines (Kizrak)
 
-
-from PIL import *
-#from ctypes import windll, Structure, byref, c_uint
-#import ctypes
-
-import ctypes
 from ctypes import *
 from ctypes.wintypes import *
 import sys
@@ -22,7 +17,7 @@ def get_screen_buffer(bounds=None):
     SM_CXVIRTUALSCREEN = 78 # width of the virtual screen
     SM_CYVIRTUALSCREEN = 79 # height of the virtual screen
 
-    hDesktopWnd = windll.user32.GetDesktopWindow() #Entire virtual Screen
+    hDesktopWnd = windll.user32.GetDesktopWindow()   # Entire virtual Screen
 
     left = windll.user32.GetSystemMetrics(SM_XVIRTUALSCREEN)
     top = windll.user32.GetSystemMetrics(SM_YVIRTUALSCREEN)
@@ -36,22 +31,21 @@ def get_screen_buffer(bounds=None):
 
     hDesktopDC = windll.user32.GetWindowDC(hDesktopWnd)
     if not hDesktopDC:
-        print ('GetDC Failed')
+        print('GetDC Failed')
         sys.exit()
 
     hCaptureDC = windll.gdi32.CreateCompatibleDC(hDesktopDC)
     if not hCaptureDC:
-        print ('CreateCompatibleBitmap Failed')
+        print('CreateCompatibleBitmap Failed')
         sys.exit()
 
     hCaptureBitmap = windll.gdi32.CreateCompatibleBitmap(hDesktopDC, width, height)
     if not hCaptureBitmap:
-        print ('CreateCompatibleBitmap Failed')
+        print('CreateCompatibleBitmap Failed')
         sys.exit()
 
     windll.gdi32.SelectObject(hCaptureDC, hCaptureBitmap)
 
-    SRCCOPY = 0x00CC0020
     windll.gdi32.BitBlt(
         hCaptureDC,
         0, 0,
@@ -62,10 +56,10 @@ def get_screen_buffer(bounds=None):
     )
     return hCaptureBitmap
 
+
 def make_image_from_buffer(hCaptureBitmap):
     from PIL import Image
     bmp_info = BITMAPINFO()
-    bmp_header = BITMAPFILEHEADER()
     hdc = windll.user32.GetDC(None)
 
     bmp_info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER)
@@ -73,29 +67,18 @@ def make_image_from_buffer(hCaptureBitmap):
     DIB_RGB_COLORS = 0
     windll.gdi32.GetDIBits(hdc,
         hCaptureBitmap,
-        0,0,
+        0, 0,
         None, byref(bmp_info),
         DIB_RGB_COLORS
     )
 
     bmp_info.bmiHeader.biSizeImage = int( bmp_info.bmiHeader.biWidth *abs(bmp_info.bmiHeader.biHeight) * (bmp_info.bmiHeader.biBitCount+7)/8 );
     size = (bmp_info.bmiHeader.biWidth, bmp_info.bmiHeader.biHeight )
-    #print (size)
     pBuf = (c_char * bmp_info.bmiHeader.biSizeImage)()
 
     windll.gdi32.GetBitmapBits(hCaptureBitmap, bmp_info.bmiHeader.biSizeImage, pBuf)
 
     return Image.frombuffer('RGB', size, pBuf, 'raw', 'BGRX', 0, 1)
-
-
-class BITMAPFILEHEADER(ctypes.Structure):
-    _fields_ = [
-        ('bfType', ctypes.c_short),
-        ('bfSize', ctypes.c_uint32),
-        ('bfReserved1', ctypes.c_short),
-        ('bfReserved2', ctypes.c_short),
-        ('bfOffBits', ctypes.c_uint32)
-    ]
 
 
 class BITMAPINFOHEADER(ctypes.Structure):
