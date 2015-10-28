@@ -1,29 +1,40 @@
 from configparser import ConfigParser
 from tempfile import gettempdir
+from os import path
 
 
 class Config(ConfigParser):
+    """
+    Wrapper Class for ConfigParser, includes default config, automated read on create, etc.
+    Usage:
+        1. get config object from module, get config parameters using type safe methods:
+            - get() (str)
+            - getint()
+            - getboolean()
+            - getfloat()
+        2. Only call read if you want it to read the file again
+        3. Only call write if you made configuration changes and want to save them
+    """
 
-    _file = open("instantshare.conf", mode='w', encoding="UTF-8")
+    _file = "instantshare.conf"
 
     def __init__(self):
         super().__init__()
         self.read()
 
-
     def __default_config(self):
         # sane default configuration
-
         params = {
             "General": {
                 "tmpdir": gettempdir() + "/",
                 "screenshot_dir": "screenshot",
-                "audio_dir": "audio"
+                "audio_dir": "audio",
+                "storage": "test"
             },
-            "Dropbox": {
+            "dropbox": {
 
             },
-            "Google Drive": {
+            "google-drive": {
 
             }
         }
@@ -36,25 +47,16 @@ class Config(ConfigParser):
 
     def read(self):
         try:
-            super().read(self._file, "UTF-8")
-            if "General" not in self.sections():
+            if not path.isfile(self._file) or path.getsize(self._file) == 0:
                 raise IOError
-        except IOError:
+            super().read([self._file])
+        except IOError as e:
+            print(e)
             # No config file, create one with default values
             self.__default_config()
 
     def write(self):
-        super().write(self._file)
+        with open(self._file, mode='w') as fp:
+            super().write(fp)
 
 CONFIG = Config()
-"""
-Wrapper Class for ConfigParser, includes default config, automated read on create, etc.
-Usage:
-    1. get config object from module, get config parameters using type safe methods:
-        - get() (str)
-        - getint()
-        - getboolean()
-        - getfloat()
-    2. Only call read if you want it to read the file again
-    3. Only call write if you made configuration changes and want to save them
-"""
