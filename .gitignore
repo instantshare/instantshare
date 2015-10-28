@@ -58,3 +58,6 @@ target/
 
 # IDE files
 .idea/
+
+# Configuration Files
+.conf
