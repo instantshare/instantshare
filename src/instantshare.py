@@ -16,10 +16,10 @@ take_screenshot(file)
 
 # initialize storage
 storage_providers = {
-#    "dropbox": Dropbox()
+     "dropbox": dropbox.Dropbox(),
 #    "google-drive": Drive()
      "test": test.Test()
 }
 sp = storage_providers[CONFIG.get("General", "storage")]
 sp.initialize()
-sp.upload(file)
+print(sp.upload(file))

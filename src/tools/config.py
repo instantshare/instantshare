@@ -32,7 +32,8 @@ class Config(ConfigParser):
                 "storage": "test"
             },
             "dropbox": {
-
+                "access_token": "0",
+                "user_id": "0"
             },
             "google-drive": {
 
