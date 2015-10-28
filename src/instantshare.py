@@ -17,7 +17,7 @@ take_screenshot(file)
 # initialize storage
 storage_providers = {
      "dropbox": dropbox.Dropbox(),
-#    "google-drive": Drive()
+     "googledrive": googledrive.GoogleDrive(),
      "test": test.Test()
 }
 sp = storage_providers[CONFIG.get("General", "storage")]

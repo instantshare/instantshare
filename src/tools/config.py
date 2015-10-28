@@ -27,15 +27,15 @@ class Config(ConfigParser):
         params = {
             "General": {
                 "tmpdir": gettempdir() + "/",
-                "screenshot_dir": "screenshot",
-                "audio_dir": "audio",
-                "storage": "test"
+                "screenshot_dir": "Screenshots",
+                "audio_dir": "AudioSnippets",
+                "storage": "googledrive"
             },
             "dropbox": {
                 "access_token": "0",
                 "user_id": "0"
             },
-            "google-drive": {
+            "googledrive": {
 
             }
         }

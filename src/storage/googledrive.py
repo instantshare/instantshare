@@ -10,35 +10,32 @@ import oauth2client
 from oauth2client import client
 from oauth2client import tools
 from storage.storage import Storage
-from tools.platform import Platform
+from tools.config import CONFIG
 
 SCOPES = 'https://www.googleapis.com/auth/drive'
 CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'Drive API Python Quickstart'
-DRIVE_SCREENSHOT_DIR = 'Screenshots'
+APPLICATION_NAME = 'Instantshare'
 
 
 class GoogleDrive(Storage):
-    def __init__(self):
+
+    def initialize(self):
         try:
             import argparse
             self.flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
         except ImportError:
             self.flags = None
-        self.initialize()
-
-    def initialize(self):
         self.credentials = self.get_credentials()
         self.http = self.credentials.authorize(httplib2.Http())
         self.service = discovery.build('drive', 'v2', http=self.http)
 
     def upload(self, file: str) -> str:
-        results = self.service.files().list(q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and title='"+DRIVE_SCREENSHOT_DIR+"'", maxResults=100).execute()
-        items = results.get('items',[])
+        results = self.service.files().list(q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and title='" + CONFIG.get("General", "screenshot_dir") + "'", maxResults=100).execute()
+        items = results.get('items', [])
         folder_id = None
         if not items:
             folder_body = {
-                'title': DRIVE_SCREENSHOT_DIR,
+                'title': CONFIG.get("General", "screenshot_dir"),
                 'parents': ['root'],
                 'mimeType': 'application/vnd.google-apps.folder'
             }
@@ -69,14 +66,15 @@ class GoogleDrive(Storage):
             self.service.permissions().insert(fileId=returnFile['id'], body=new_permission).execute()
             print("Permissions should be set now!")
             retStr = "http://drive.google.com/uc?export=view&id=" + returnFile['selfLink'].split("/files/")[1]
-            print(retStr)
             return retStr
         except errors.HttpError as e:
             print(e)
             return None
 
     def get_credentials(self):
-        """Gets valid user credentials from storage.
+        """
+        Taken from: https://developers.google.com/drive/web/quickstart/python
+        Gets valid user credentials from storage.
 
         If nothing has been stored, or if the stored credentials are invalid,
         the OAuth2 flow is completed to obtain the new credentials.
@@ -97,12 +95,6 @@ class GoogleDrive(Storage):
         if not credentials or credentials.invalid:
             flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
             flow.user_agent = APPLICATION_NAME
-
-            if self.flags:
-                credentials = tools.run_flow(flow, store, self.flags)
-            else: # Needed only for compatability with Python 2.6
-                credentials = tools.run(flow, store)
-
-            #credentials = tools.run_flow(flow, store, flags)
+            credentials = tools.run_flow(flow, store, self.flags)
             print('Storing credentials to ' + credential_path)
         return credentials

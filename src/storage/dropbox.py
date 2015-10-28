@@ -8,11 +8,11 @@ import webbrowser
 
 class Dropbox(Storage):
     def initialize(self):
-        # TODO: Add routine for savely stored app_key and app_secret
+        # TODO: Add routine for safely stored app_key and app_secret
         app_key = CONFIG.get("dropbox", "app_key")
         app_secret = CONFIG.get("dropbox", "app_secret")
 
-        if (CONFIG.get("dropbox", "access_token") == "0"):
+        if CONFIG.getint("dropbox", "access_token") == 0:
             flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
             authorize_url = flow.start()
 
