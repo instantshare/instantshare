@@ -110,6 +110,8 @@ def take_screenshot(path):
     hCaptureBitmap = get_screen_buffer()
 
     pimage = make_image_from_buffer(hCaptureBitmap)
+    #pimage.save(path,"PNG")
+
     trash1,trash2,width,height = pimage.getbbox()
 
     root = Tk()
@@ -135,8 +137,16 @@ def take_screenshot(path):
         CanInfo.rect = can.create_rectangle(CanInfo.startx, CanInfo.starty, event.x, event.y)
 
     def save_img(event):
+        startx, starty = CanInfo.startx, CanInfo.starty
         endx, endy = event.x, event.y
-        pimage.crop((CanInfo.startx, CanInfo.starty, endx, endy)).save(path,"PNG")
+
+        if (startx > endx):
+            startx, endx = endx, startx
+        if (starty > endy):
+            starty, endy = endy, starty
+
+        cropImage = pimage.crop((startx, starty, endx, endy))
+        cropImage.save(path,"PNG")
         root.destroy()
 
     can.bind("<Button-1>", xy)
