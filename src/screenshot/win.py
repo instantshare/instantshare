@@ -6,6 +6,9 @@
 from ctypes import *
 from ctypes.wintypes import *
 import sys
+from tkinter import *
+from tkinter import ttk
+from PIL import ImageTk
 
 
 def get_screen_buffer(bounds=None):
@@ -107,5 +110,37 @@ def take_screenshot(path):
     hCaptureBitmap = get_screen_buffer()
 
     pimage = make_image_from_buffer(hCaptureBitmap)
+    trash1,trash2,width,height = pimage.getbbox()
 
-    pimage.save(path,"PNG")
+    root = Tk()
+    root.overrideredirect(True)
+    root.geometry("{0}x{1}+0+0".format(width, height))
+    root.config(cursor="crosshair")
+
+    pimageTk = ImageTk.PhotoImage(pimage)
+
+    can = Canvas(root, width=width, height=height)
+    can.pack()
+    can.create_image((0,0),image=pimageTk, anchor="nw")
+
+    class CanInfo:
+        rect = None
+        startx, starty = 0, 0
+
+    def xy(event):
+        CanInfo.startx, CanInfo.starty = event.x, event.y
+
+    def capture_motion(event):
+        can.delete(CanInfo.rect)
+        CanInfo.rect = can.create_rectangle(CanInfo.startx, CanInfo.starty, event.x, event.y)
+
+    def save_img(event):
+        endx, endy = event.x, event.y
+        pimage.crop((CanInfo.startx, CanInfo.starty, endx, endy)).save(path,"PNG")
+        root.destroy()
+
+    can.bind("<Button-1>", xy)
+    can.bind("<B1-Motion>", capture_motion)
+    can.bind("<ButtonRelease-1>", save_img)
+
+    root.mainloop()
