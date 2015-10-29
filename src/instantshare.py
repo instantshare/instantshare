@@ -2,6 +2,7 @@ from tools.platform import Platform
 from time import strftime
 from tools.config import CONFIG
 from storage import *
+import webbrowser
 
 # take screenshot
 if Platform.this == Platform.LINUX:
@@ -22,4 +23,6 @@ storage_providers = {
 }
 sp = storage_providers[CONFIG.get("General", "storage")]
 sp.initialize()
-print(sp.upload(file))
+url = sp.upload(file)
+print(url)
+webbrowser.open_new_tab(url)
