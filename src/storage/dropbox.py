@@ -12,7 +12,7 @@ class Dropbox(Storage):
         app_key = CONFIG.get("dropbox", "app_key")
         app_secret = CONFIG.get("dropbox", "app_secret")
 
-        if CONFIG.getint("dropbox", "access_token") == 0:
+        if CONFIG.get("dropbox", "access_token") == "0":
             flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
             authorize_url = flow.start()
 
