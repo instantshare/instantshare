@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from tools.platform import Platform
 from time import strftime
 from tools.config import CONFIG
