@@ -2,8 +2,14 @@
 Tool for taking screenshots and instantly sharing them using a number of services.
 
 Currently supported are:
-    - Dropbox
-    - Google Drive
+- Dropbox
+- Google Drive
+
+Services to be added in the future:
+- FTP, SFTP
+- Owncloud
+- maybe a specialized self-made Webservice
+- ...
 
 ## Installation
 At this point, the supported platforms are Windows and GNU/Linux.
