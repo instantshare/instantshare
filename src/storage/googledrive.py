@@ -18,7 +18,6 @@ APPLICATION_NAME = 'Instantshare'
 
 
 class GoogleDrive(Storage):
-
     def initialize(self):
         try:
             import argparse
@@ -29,10 +28,15 @@ class GoogleDrive(Storage):
         self.http = self.credentials.authorize(httplib2.Http())
         self.service = discovery.build('drive', 'v2', http=self.http)
 
+    # This method uploads a file to Google Drive
     def upload(self, file: str) -> str:
-        results = self.service.files().list(q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and title='" + CONFIG.get("General", "screenshot_dir") + "'", maxResults=100).execute()
+        # Returns a list of folders in the root directory with a title equaling the screenshot_dir
+        results = self.service.files().list(
+            q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and title='" + CONFIG.get(
+                "General", "screenshot_dir") + "'", maxResults=100).execute()
         items = results.get('items', [])
-        folder_id = None
+
+        # Checks if the directory already exists and if not it will create it
         if not items:
             folder_body = {
                 'title': CONFIG.get("General", "screenshot_dir"),
@@ -41,12 +45,13 @@ class GoogleDrive(Storage):
             }
             try:
                 returnFolder = self.service.files().insert(body=folder_body).execute()
+                folder_id = returnFolder.get("id")
             except errors.HttpError as e:
                 print(e)
-            folder_id = returnFolder.get("id")
         else:
             folder_id = items[0]['id']
 
+        # Defines some bodys for communicating with Google Drive
         media_body = MediaFileUpload(file, resumable=True)
         body = {
             'title': ntpath.basename(file),
@@ -61,10 +66,13 @@ class GoogleDrive(Storage):
         }
 
         try:
+            # Uploads the file to Drive
             returnFile = self.service.files().insert(body=body, media_body=media_body).execute()
-            print("Upload should be done now!")
+            print("Upload done!")
+            # Shares the file so everybody with the link can read it
             self.service.permissions().insert(fileId=returnFile['id'], body=new_permission).execute()
-            print("Permissions should be set now!")
+            print("Permissions set!")
+            # Inserts the file ID into another URL for a better image view in the browser
             retStr = "http://drive.google.com/uc?export=view&id=" + returnFile['selfLink'].split("/files/")[1]
             return retStr
         except errors.HttpError as e:
@@ -91,7 +99,7 @@ class GoogleDrive(Storage):
                                        'drive-python-quickstart.json')
 
         store = oauth2client.file.Storage(credential_path)
-        credentials = store.get()       # credentials is oauth2client.client.Credentials
+        credentials = store.get()  # credentials is oauth2client.client.Credentials
         if not credentials or credentials.invalid:
             flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
             flow.user_agent = APPLICATION_NAME
