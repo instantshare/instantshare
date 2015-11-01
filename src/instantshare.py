@@ -8,13 +8,15 @@ import webbrowser
 # take screenshot
 if Platform.this == Platform.LINUX:
     import screenshot.linux
-    take_screenshot = screenshot.linux.take_screenshot
+    take_screenshot_crop = screenshot.linux.take_screenshot_crop
+    take_screenshot_whole = screenshot.linux.take_screenshot_whole
 elif Platform.this == Platform.WINDOWS:
     import screenshot.win
-    take_screenshot = screenshot.win.take_screenshot
+    take_screenshot_crop = screenshot.win.take_screenshot_crop
+    take_screenshot_whole = screenshot.win.take_screenshot_whole
 
 file = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
-take_screenshot(file)
+take_screenshot_crop(file)
 
 # initialize storage
 storage_providers = {

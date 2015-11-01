@@ -106,8 +106,14 @@ class BITMAPINFO(ctypes.Structure):
         ('bmiColors', ctypes.c_ulong * 3)
     ]
 
+def take_screenshot_whole(path):
+    hCaptureBitmap = get_screen_buffer()
+    pimage = make_image_from_buffer(hCaptureBitmap)     # Converts the image buffer into a PIL.Image
+    pimage.save(path,"PNG")
+
+
 # Takes a screenshot and saves it to the specified path
-def take_screenshot(path):
+def take_screenshot_crop(path):
     hCaptureBitmap = get_screen_buffer()
 
     pimage = make_image_from_buffer(hCaptureBitmap)     # Converts the image buffer into a PIL.Image
