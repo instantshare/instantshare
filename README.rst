@@ -38,7 +38,7 @@ Linux
 -----
 - Install Python 3.5 using your package manager if it does not come with your distro
 - Install gnome-screenshot using your package manager
-- Install dependencies using pip
+- Install dependencies using pip (if pip is not installed yet, install python-pip using your package manager)
 - You might need to manually change the permissions of the cacerts.txt file used by httplib2 to 644.
 
 .. code-block:: bash
