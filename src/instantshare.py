@@ -7,7 +7,6 @@ from tempfile import gettempdir
 from time import strftime
 from tools.config import CONFIG
 
-
 class InstantShare:
     def __init__(self):
         import importlib
