@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from time import strftime
+import webbrowser
+
 from tools.config import CONFIG
 from storage import *
 from tools.screenshot import Screen
-import webbrowser
 
 
 class InstantShare:
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     app = InstantShare()
 
     if args["tray"]:
-        from tools.traymenu import Tray
+        from gui.traymenu import Tray
         from tools.toolbox import delay_execution
 
         # define callbacks for menu items in system tray context menu
