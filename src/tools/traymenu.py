@@ -1,43 +1,26 @@
-from time import strftime, sleep
-import webbrowser
-from tools.config import CONFIG
+from time import sleep
 from tools.platform import Platform
-from tools.screenshot import Screen
 from tools.systrayicon import SysTrayIcon
+from instantshare import InstantShare
 
 
 class Tray(Platform):
-    def __init__(self, storage_provider):
-        super(self.__class__, self).__init__()
-        self.storage_provider = storage_provider
-
     def show_traymenu(self):
         pass
 
     def init_windows(self):
-        s = Screen()
-
-        def upload(path):
-            url = self.storage_provider.upload(path)
-            print(url)
-            webbrowser.open_new_tab(url)
-
-        def whole(_):
+        def cap_whole_click(_):
             sleep(0.3)  # Needed to let the context menu disappear completely before taking a screenshot
-            path = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
-            s.take_screenshot_whole(path)
-            upload(path)
+            InstantShare.take_screenshot_whole()
 
-        def crop(_):
+        def cap_crop_click(_):
             sleep(0.3)  # Needed to let the context menu disappear completely before taking a screenshot
-            path = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
-            s.take_screenshot_crop(path)
-            upload(path)
+            InstantShare.take_screenshot_crop()
 
         hover_text = "InstantScreen"
 
-        menu_options = (("Capture Desktop", None, whole),
-                        ("Capture Area", None, crop))
+        menu_options = (("Capture Desktop", None, cap_whole_click),
+                        ("Capture Area", None, cap_crop_click))
 
         self.show_traymenu = lambda: SysTrayIcon("InstantScreen.ico", hover_text, menu_options)
 
