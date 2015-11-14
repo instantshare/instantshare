@@ -1,48 +1,42 @@
 #!/usr/bin/env python3
 from time import strftime
+import webbrowser
+
 from tools.config import CONFIG
 from storage import *
 from tools.screenshot import Screen
-import webbrowser
 
 
 class InstantShare:
-    s = Screen()
+    def __init__(self):
+        self.screen = Screen()
+        # initialize storage
+        storage_providers = {
+            "dropbox": dropbox.Dropbox(),
+            "googledrive": googledrive.GoogleDrive(),
+            "test": test.Test()
+        }
+        self.storage = storage_providers[CONFIG.get("General", "storage")]
+        self.storage.initialize()
 
-    # initialize storage
-    storage_providers = {
-        "dropbox": dropbox.Dropbox(),
-        "googledrive": googledrive.GoogleDrive(),
-        "test": test.Test()
-    }
-    sp = storage_providers[CONFIG.get("General", "storage")]
-    sp.initialize()
-
-    @staticmethod
-    def take_screenshot_whole():
+    def take_screenshot(self, crop=True):
         file = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
-        InstantShare.s.take_screenshot_whole(file)
-        InstantShare.upload_file(file)
-
-    @staticmethod
-    def take_screenshot_crop():
-        file = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
-        InstantShare.s.take_screenshot_crop(file)
-        InstantShare.upload_file(file)
-
-    @staticmethod
-    def upload_file(path):
-        url = InstantShare.sp.upload(path)
+        if crop:
+            self.screen.take_screenshot_crop(file)
+        else:
+            self.screen.take_screenshot_whole(file)
+        url = self.storage.upload(file)
         print(url)
         webbrowser.open_new_tab(url)
 
 
 if __name__ == "__main__":
     import argparse
-    from tools.traymenu import Tray
     # parse arguments
     parser = argparse.ArgumentParser(description="Take a screenshot and upload it.")
-    # dest defines the name of the key in the dictionary. The value will be true or false (action="store_true")
+    # dest defines the name of the key in the dictionary.
+    # The value will be true (arg present) or false (arg absent)
+    # This is behaviour defined using action="store_true"
     parser.add_argument("-w", "--whole", dest="whole", action="store_true",
                         help="Takes a screenshot of the whole screen.")
     parser.add_argument("-c", "--crop", dest="crop", action="store_true",
@@ -51,11 +45,22 @@ if __name__ == "__main__":
                         help="Starts tray mode. Currently only available on Windows.")
 
     args = vars(parser.parse_args())
+    app = InstantShare()
 
-    if args.get("tray"):
-        tm = Tray()
-        tm.show_traymenu()
-    elif args.get("whole"):
-        InstantShare.take_screenshot_whole()
+    if args["tray"]:
+        from gui.traymenu import Tray
+        from tools.toolbox import delay_execution
+
+        # define callbacks for menu items in system tray context menu
+        tray_callbacks = (
+            lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=False)),
+            lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=True))
+        )
+
+        # create tray
+        tm = Tray(*tray_callbacks)
+        tm.show()
+    elif args["whole"]:
+        app.take_screenshot(crop=False)
     else:
-        InstantShare.take_screenshot_crop()
+        app.take_screenshot(crop=True)
