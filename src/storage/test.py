@@ -1,12 +1,12 @@
 from storage.storage import Storage
-
+import logging
 
 class Test(Storage):
 
     def initialize(self):
-        print("initialize() called")
+        logging.info("Test initialize was called")
         pass
 
     def upload(self, file: str) -> str:
-        print("upload() called")
-        return "It works!"
+        logging.info("Test upload was called")
+        return file

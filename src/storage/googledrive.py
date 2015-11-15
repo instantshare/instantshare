@@ -9,6 +9,7 @@ from apiclient import discovery
 import oauth2client
 from oauth2client import client
 from oauth2client import tools
+import logging
 from storage.storage import Storage
 from tools.config import CONFIG
 
@@ -23,6 +24,7 @@ class GoogleDrive(Storage):
             import argparse
             self.flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
         except ImportError:
+            logging.error("Arguments could not be parsed.")
             self.flags = None
         self.credentials = self.get_credentials()
         self.http = self.credentials.authorize(httplib2.Http())
@@ -47,7 +49,8 @@ class GoogleDrive(Storage):
                 returnFolder = self.service.files().insert(body=folder_body).execute()
                 folder_id = returnFolder.get("id")
             except errors.HttpError as e:
-                print(e)
+                logging.error(e)
+                return None
         else:
             folder_id = items[0]['id']
 
@@ -68,15 +71,15 @@ class GoogleDrive(Storage):
         try:
             # Uploads the file to Drive
             returnFile = self.service.files().insert(body=body, media_body=media_body).execute()
-            print("Upload done!")
+            logging.info("Google Drive upload done")
             # Shares the file so everybody with the link can read it
             self.service.permissions().insert(fileId=returnFile['id'], body=new_permission).execute()
-            print("Permissions set!")
+            logging.info("Google Drive permissions set")
             # Inserts the file ID into another URL for a better image view in the browser
             retStr = "http://drive.google.com/uc?export=view&id=" + returnFile['selfLink'].split("/files/")[1]
             return retStr
         except errors.HttpError as e:
-            print(e)
+            logging.info(e)
             return None
 
     def get_credentials(self):
@@ -104,5 +107,5 @@ class GoogleDrive(Storage):
             flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
             flow.user_agent = APPLICATION_NAME
             credentials = tools.run_flow(flow, store, self.flags)
-            print('Storing credentials to ' + credential_path)
+            logging.info("Storing credentials to: %s",credential_path)
         return credentials

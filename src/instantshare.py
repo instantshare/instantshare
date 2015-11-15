@@ -26,12 +26,17 @@ class InstantShare:
         else:
             self.screen.take_screenshot_whole(file)
         url = self.storage.upload(file)
-        print(url)
+        logging.info("Uploaded file to: %s", url)
         webbrowser.open_new_tab(url)
 
 
 if __name__ == "__main__":
     import argparse
+    import logging
+    #setup logging
+    #logging.basicConfig(filename="instantshare.log",level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
+
     # parse arguments
     parser = argparse.ArgumentParser(description="Take a screenshot and upload it.")
     # dest defines the name of the key in the dictionary.
@@ -50,6 +55,7 @@ if __name__ == "__main__":
     if args["tray"]:
         from gui.traymenu import Tray
         from tools.toolbox import delay_execution
+        logging.info("InstantShare started in tray mode")
 
         # define callbacks for menu items in system tray context menu
         tray_callbacks = (
@@ -61,6 +67,8 @@ if __name__ == "__main__":
         tm = Tray(*tray_callbacks)
         tm.show()
     elif args["whole"]:
+        logging.info("InstantShare started in tray mode")
         app.take_screenshot(crop=False)
     else:
-        app.take_screenshot(crop=True)
+         logging.info("InstantShare started in tray mode")
+         app.take_screenshot(crop=True)

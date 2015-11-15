@@ -1,3 +1,4 @@
+import logging
 from tools.platform import Platform
 
 
@@ -103,7 +104,7 @@ class Tray(Platform):
                                        self._add_ids_to_menu_options(option_action),
                                        self._next_action_id))
                     else:
-                        print('Unknown item', option_text, option_icon, option_action)
+                        logging.info("Unknown item " + option_text + " " + option_icon + " " + option_action)
                     self._next_action_id += 1
                 return result
 
@@ -119,7 +120,7 @@ class Tray(Platform):
                                                0,
                                                icon_flags)
                 else:
-                    print("Can't find icon file - using default.")
+                    logging.error("Can't find icon file - using default.")
                     hicon = win32gui.LoadIcon(0, win32con.IDI_APPLICATION)
 
                 if self.notify_id:

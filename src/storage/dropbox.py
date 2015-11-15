@@ -4,6 +4,7 @@ from tools.config import CONFIG
 import dropbox
 import ntpath
 import webbrowser
+import logging
 
 
 class Dropbox(Storage):
@@ -38,7 +39,7 @@ class Dropbox(Storage):
         try:
             response = dropbox_client.put_file(dropbox_filepath, f)
         except dropbox.rest.ErrorResponse as e:
-            print(e.error_msg)
+            logging.error(e.error_msg)
 
         url = dropbox_client.media(dropbox_filepath)["url"]
         return url

@@ -1,3 +1,4 @@
+import logging
 from tools.platform import Platform
 
 
@@ -50,17 +51,17 @@ class Screen(Platform):
 
             hDesktopDC = c.windll.user32.GetWindowDC(hDesktopWnd)
             if not hDesktopDC:
-                print('GetDC Failed')
+                logging.error("GetDC Failed")
                 sys.exit()
 
             hCaptureDC = c.windll.gdi32.CreateCompatibleDC(hDesktopDC)
             if not hCaptureDC:
-                print('CreateCompatibleBitmap Failed')
+                logging.error("CreateCompatibleBitmap Failed")
                 sys.exit()
 
             hCaptureBitmap = c.windll.gdi32.CreateCompatibleBitmap(hDesktopDC, width, height)
             if not hCaptureBitmap:
-                print('CreateCompatibleBitmap Failed')
+                logging.error("CreateCompatibleBitmap Failed")
                 sys.exit()
 
             c.windll.gdi32.SelectObject(hCaptureDC, hCaptureBitmap)
