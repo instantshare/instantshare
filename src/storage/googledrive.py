@@ -46,8 +46,8 @@ class GoogleDrive(Storage):
                 'mimeType': 'application/vnd.google-apps.folder'
             }
             try:
-                returnFolder = self.service.files().insert(body=folder_body).execute()
-                folder_id = returnFolder.get("id")
+                return_folder = self.service.files().insert(body=folder_body).execute()
+                folder_id = return_folder.get("id")
             except errors.HttpError as e:
                 logging.error(e)
                 return None
@@ -70,14 +70,14 @@ class GoogleDrive(Storage):
 
         try:
             # Uploads the file to Drive
-            returnFile = self.service.files().insert(body=body, media_body=media_body).execute()
+            return_file = self.service.files().insert(body=body, media_body=media_body).execute()
             logging.info("Google Drive upload done")
             # Shares the file so everybody with the link can read it
-            self.service.permissions().insert(fileId=returnFile['id'], body=new_permission).execute()
+            self.service.permissions().insert(fileId=return_file['id'], body=new_permission).execute()
             logging.info("Google Drive permissions set")
             # Inserts the file ID into another URL for a better image view in the browser
-            retStr = "http://drive.google.com/uc?export=view&id=" + returnFile['selfLink'].split("/files/")[1]
-            return retStr
+            ret_str = "http://drive.google.com/uc?export=view&id=" + return_file['selfLink'].split("/files/")[1]
+            return ret_str
         except errors.HttpError as e:
             logging.info(e)
             return None
@@ -107,5 +107,5 @@ class GoogleDrive(Storage):
             flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
             flow.user_agent = APPLICATION_NAME
             credentials = tools.run_flow(flow, store, self.flags)
-            logging.info("Storing credentials to: %s",credential_path)
+            logging.info("Storing credentials to: %s", credential_path)
         return credentials

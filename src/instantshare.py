@@ -33,8 +33,8 @@ class InstantShare:
 if __name__ == "__main__":
     import argparse
     import logging
-    #setup logging
-    #logging.basicConfig(filename="instantshare.log",level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
+    # setup logging
+    # logging.basicConfig(filename="instantshare.log",level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
 
     # parse arguments
@@ -70,5 +70,5 @@ if __name__ == "__main__":
         logging.info("InstantShare started in tray mode")
         app.take_screenshot(crop=False)
     else:
-         logging.info("InstantShare started in tray mode")
-         app.take_screenshot(crop=True)
+        logging.info("InstantShare started in tray mode")
+        app.take_screenshot(crop=True)
