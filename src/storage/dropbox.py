@@ -1,4 +1,3 @@
-from pip._vendor.distlib.compat import raw_input
 from storage.storage import Storage
 from tools.config import CONFIG
 import dropbox
@@ -8,17 +7,20 @@ import logging
 
 
 class Dropbox(Storage):
-    def initialize(self):
+
+    def __init__(self):
+        super().__init__()
         # TODO: Add routine for safely stored app_key and app_secret
         app_key = CONFIG.get("dropbox", "app_key")
         app_secret = CONFIG.get("dropbox", "app_secret")
 
+        # TODO: Use another way to find out if the access token is valid
         if CONFIG.get("dropbox", "access_token") == "0":
             flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
             authorize_url = flow.start()
 
             webbrowser.open_new_tab(authorize_url)
-            code = raw_input("Enter the authorization code here: ").strip()
+            code = input("Enter the authorization code here: ").strip()
 
             access_token, user_id = flow.finish(code)
 

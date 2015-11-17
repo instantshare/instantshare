@@ -19,7 +19,9 @@ APPLICATION_NAME = 'Instantshare'
 
 
 class GoogleDrive(Storage):
-    def initialize(self):
+
+    def __init__(self):
+        super().__init__()
         try:
             import argparse
             self.flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -30,7 +32,6 @@ class GoogleDrive(Storage):
         self.http = self.credentials.authorize(httplib2.Http())
         self.service = discovery.build('drive', 'v2', http=self.http)
 
-    # This method uploads a file to Google Drive
     def upload(self, file: str) -> str:
         # Returns a list of folders in the root directory with a title equaling the screenshot_dir
         results = self.service.files().list(
@@ -54,7 +55,7 @@ class GoogleDrive(Storage):
         else:
             folder_id = items[0]['id']
 
-        # Defines some bodys for communicating with Google Drive
+        # Defines some bodies for communicating with Google Drive
         media_body = MediaFileUpload(file, resumable=True)
         body = {
             'title': ntpath.basename(file),

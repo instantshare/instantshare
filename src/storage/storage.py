@@ -7,7 +7,7 @@ class Storage(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def initialize(self):
+    def __init__(self):
         """
         Initialize the storage (authentication and authorization)
         """

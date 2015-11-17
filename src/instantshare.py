@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
 from time import strftime
 import webbrowser
-
 from tools.config import CONFIG
-from storage import *
 from tools.screenshot import Screen
+from storage import *
 
+storage_providers = {
+    "dropbox": dropbox.Dropbox,
+    "googledrive": googledrive.GoogleDrive
+}
 
 class InstantShare:
     def __init__(self):
         self.screen = Screen()
-        # initialize storage
-        storage_providers = {
-            "dropbox": dropbox.Dropbox(),
-            "googledrive": googledrive.GoogleDrive(),
-            "test": test.Test()
-        }
-        self.storage = storage_providers[CONFIG.get("General", "storage")]
-        self.storage.initialize()
+        self.storage_provider = storage_providers[CONFIG.get("General", "storage")]()
 
     def take_screenshot(self, crop=True):
         file = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
@@ -25,7 +21,7 @@ class InstantShare:
             self.screen.take_screenshot_crop(file)
         else:
             self.screen.take_screenshot_whole(file)
-        url = self.storage.upload(file)
+        url = self.storage_provider.upload(file)
         logging.info("Uploaded file to: %s", url)
         webbrowser.open_new_tab(url)
 
@@ -33,8 +29,7 @@ class InstantShare:
 if __name__ == "__main__":
     import argparse
     import logging
-    # setup logging
-    # logging.basicConfig(filename="instantshare.log",level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
+    # logging.basicConfig(filename="instantshare.log", level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
 
     # parse arguments

@@ -1,1 +1,1 @@
-__all__ = ["test", "storage", "dropbox", "googledrive"]
+__all__ = ["storage", "dropbox", "googledrive"]
