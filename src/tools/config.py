@@ -1,7 +1,6 @@
 from configparser import ConfigParser
 import logging
 from os import path
-import os
 
 
 class Config(ConfigParser):
@@ -26,7 +25,6 @@ class Config(ConfigParser):
 
     def __default_config(self):
         # sane default configuration
-        cwd = os.getcwd()
         with open(Config._default) as _in, open(Config._file, "w") as _out:
             _out.write(_in.read())
         self.read()
