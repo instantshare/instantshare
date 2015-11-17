@@ -1,7 +1,7 @@
 from configparser import ConfigParser
 import logging
-from tempfile import gettempdir
 from os import path
+import os
 
 
 class Config(ConfigParser):
@@ -18,6 +18,7 @@ class Config(ConfigParser):
     """
     general = "General"
     _file = "instantshare.conf"
+    _default = "res/instantshare.default"
 
     def __init__(self):
         super().__init__()
@@ -25,27 +26,10 @@ class Config(ConfigParser):
 
     def __default_config(self):
         # sane default configuration
-        params = {
-            Config.general: {
-                "tmpdir": gettempdir() + "/",
-                "screenshot_dir": "Screenshots",
-                "audio_dir": "AudioSnippets",
-                "storage": "googledrive"
-            },
-            "dropbox": {
-                "access_token": "0",
-                "user_id": "0"
-            },
-            "googledrive": {
-
-            }
-        }
-        # write configuration to file
-        for section in params:
-            self.add_section(section)
-            for option in params[section]:
-                self.set(section, option, params[section][option])
-        self.write()
+        cwd = os.getcwd()
+        with open(Config._default) as _in, open(Config._file, "w") as _out:
+            _out.write(_in.read())
+        self.read()
 
     def read(self):
         try:

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+from tempfile import gettempdir
 from time import strftime
 import webbrowser
 from tools.config import CONFIG
 from tools.screenshot import Screen
+
+# import * because __init__.py needs to be evaluated
 from storage import *
 
 
@@ -12,7 +15,7 @@ class InstantShare:
         self.storage_provider = storage_providers[CONFIG.get(CONFIG.general, "storage")]()
 
     def take_screenshot(self, crop=True):
-        file = CONFIG.get(CONFIG.general, "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
+        file = "{}/instantscreen_{}.png".format(gettempdir(), strftime("%Y-%m-%d_%H-%I-%S"))
         if crop:
             self.screen.take_screenshot_crop(file)
         else:

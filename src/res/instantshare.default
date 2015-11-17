@@ -1,0 +1,22 @@
+[General]
+storage = googledrive
+audio_dir = audio
+screenshot_dir = Screenshots
+
+[dropbox]
+app_key = 81glnb2w8xfo0lz
+auth_url = 0
+scope = 0
+user_id = 0
+access_token = 0
+
+[googledrive]
+app_key = 0
+auth_url = 0
+scope = 0
+
+[owncloud]
+url = 0
+username = 0
+password = 0
+
