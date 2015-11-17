@@ -1,4 +1,5 @@
 from __future__ import print_function
+from argparse import Namespace
 from googleapiclient import errors
 from googleapiclient.http import MediaFileUpload
 import httplib2
@@ -22,12 +23,7 @@ class GoogleDrive(Storage):
 
     def __init__(self):
         super().__init__()
-        try:
-            import argparse
-            self.flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-        except ImportError:
-            logging.error("Arguments could not be parsed.")
-            self.flags = None
+        self.flags = Namespace(auth_host_name='localhost', auth_host_port=[8080, 8090], logging_level='ERROR', noauth_local_webserver=False)
         self.credentials = self.get_credentials()
         self.http = self.credentials.authorize(httplib2.Http())
         self.service = discovery.build('drive', 'v2', http=self.http)
