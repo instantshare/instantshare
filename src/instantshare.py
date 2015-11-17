@@ -5,18 +5,14 @@ from tools.config import CONFIG
 from tools.screenshot import Screen
 from storage import *
 
-storage_providers = {
-    "dropbox": dropbox.Dropbox,
-    "googledrive": googledrive.GoogleDrive
-}
 
 class InstantShare:
     def __init__(self):
         self.screen = Screen()
-        self.storage_provider = storage_providers[CONFIG.get("General", "storage")]()
+        self.storage_provider = storage_providers[CONFIG.get(CONFIG.general, "storage")]()
 
     def take_screenshot(self, crop=True):
-        file = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
+        file = CONFIG.get(CONFIG.general, "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
         if crop:
             self.screen.take_screenshot_crop(file)
         else:

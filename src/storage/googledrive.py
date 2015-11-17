@@ -11,7 +11,7 @@ import oauth2client
 from oauth2client import client
 from oauth2client import tools
 import logging
-from storage.storage import Storage
+import storage
 from tools.config import CONFIG
 
 SCOPES = 'https://www.googleapis.com/auth/drive'
@@ -19,7 +19,8 @@ CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Instantshare'
 
 
-class GoogleDrive(Storage):
+@storage.register
+class GoogleDrive(storage.Base):
 
     def __init__(self):
         super().__init__()
@@ -28,17 +29,21 @@ class GoogleDrive(Storage):
         self.http = self.credentials.authorize(httplib2.Http())
         self.service = discovery.build('drive', 'v2', http=self.http)
 
+    @staticmethod
+    def name() -> str:
+        return "googledrive"
+
     def upload(self, file: str) -> str:
         # Returns a list of folders in the root directory with a title equaling the screenshot_dir
         results = self.service.files().list(
             q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and title='" + CONFIG.get(
-                "General", "screenshot_dir") + "'", maxResults=100).execute()
+                CONFIG.general, "screenshot_dir") + "'", maxResults=100).execute()
         items = results.get('items', [])
 
         # Checks if the directory already exists and if not it will create it
         if not items:
             folder_body = {
-                'title': CONFIG.get("General", "screenshot_dir"),
+                'title': CONFIG.get(CONFIG.general, "screenshot_dir"),
                 'parents': ['root'],
                 'mimeType': 'application/vnd.google-apps.folder'
             }

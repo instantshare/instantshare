@@ -16,7 +16,7 @@ class Config(ConfigParser):
         2. Only call read if you want it to read the file again
         3. Only call write if you made configuration changes and want to save them
     """
-
+    general = "General"
     _file = "instantshare.conf"
 
     def __init__(self):
@@ -26,7 +26,7 @@ class Config(ConfigParser):
     def __default_config(self):
         # sane default configuration
         params = {
-            "General": {
+            Config.general: {
                 "tmpdir": gettempdir() + "/",
                 "screenshot_dir": "Screenshots",
                 "audio_dir": "AudioSnippets",
