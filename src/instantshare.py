@@ -50,7 +50,7 @@ if __name__ == "__main__":
     if args["tray"]:
         from gui.traymenu import Tray
         from tools.toolbox import delay_execution
-        logging.info("InstantShare started in tray mode")
+        logging.info("InstantShare started in \"tray\" mode")
 
         # define callbacks for menu items in system tray context menu
         tray_callbacks = (
@@ -62,8 +62,8 @@ if __name__ == "__main__":
         tm = Tray(*tray_callbacks)
         tm.show()
     elif args["whole"]:
-        logging.info("InstantShare started in tray mode")
+        logging.info("InstantShare started in \"whole screen\" mode")
         app.take_screenshot(crop=False)
     else:
-        logging.info("InstantShare started in tray mode")
+        logging.info("InstantShare started in \"crop\" mode")
         app.take_screenshot(crop=True)
