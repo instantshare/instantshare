@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-__all__ = ["dropbox", "googledrive", "storage_providers"]
+__all__ = ["dropbox", "googledrive", "sftp", "storage_providers"]
 
 storage_providers = {}
 

@@ -1,3 +1,4 @@
+paramiko
 dropbox
 google-api-python-client
 pillow
