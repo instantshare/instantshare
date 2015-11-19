@@ -1,5 +1,5 @@
 import shlex
-from subprocess import call, Popen, PIPE
+from subprocess import Popen, PIPE
 import tools.platform
 
 
@@ -11,12 +11,12 @@ class Clipboard(tools.platform.Platform):
         super().__init__()
 
     def init_linux(self):
-        def set(data):
+        def s(data):
             cmd = shlex.split("xclip -selection clipboard")
             p = Popen(cmd, stdin=PIPE)
             p.communicate(input=bytes(data, encoding="utf-8"))
 
-        def get():
+        def g():
             cmd = shlex.split("xclip -o -selection clipboard")
             p = Popen(cmd, stdout=PIPE, stderr=PIPE)
             out, err = p.communicate()
@@ -25,8 +25,8 @@ class Clipboard(tools.platform.Platform):
             else:
                 return str(out, encoding="utf-8")
 
-        self.set = set
-        self.get = get
+        self.set = s
+        self.get = g
 
     def init_windows(self):
         pass

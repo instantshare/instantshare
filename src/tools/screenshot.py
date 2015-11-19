@@ -4,19 +4,10 @@ from tools.platform import Platform
 
 class Screen(Platform):
 
-    def take_screenshot_crop(self, path):
-        """
-        Takes screenshot of a user defined area and saves it to the specified path.
-        :param path: string indicating the full path to a file
-        """
-        pass
-
-    def take_screenshot_whole(self, path):
-        """
-        Takes screenshot of the whole screen and saves it to the specified path.
-        :param path: string indicating the full path to a file
-        """
-        pass
+    def __init__(self):
+        self.take_screenshot_crop = lambda path: None
+        self.take_screenshot_whole = lambda path: None
+        super().__init__()
 
     def init_windows(self):
         # https://github.com/chriskiehl/pyrobot

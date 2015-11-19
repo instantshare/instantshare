@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 
-# change directory before importing other modules
+# do prep work before importing other modules
 import os
 os.chdir(os.path.dirname(__file__))
-print(os.getcwd())
-
 from tempfile import gettempdir
 from time import strftime
-import webbrowser
 from tools.config import CONFIG
 from tools.screenshot import Screen
 
-# import * because __init__.py needs to be evaluated
+# import * because its __init__.py needs to be evaluated
 from storage import *
 
 
@@ -32,6 +29,7 @@ class InstantShare:
             import tools.clipboard
             tools.clipboard.Clipboard().set(url)
         else:
+            import webbrowser
             webbrowser.open_new_tab(url)
 
 
