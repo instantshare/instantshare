@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+# change directory before importing other modules
+import os
+os.chdir(os.path.dirname(__file__))
+print(os.getcwd())
+
 from tempfile import gettempdir
 from time import strftime
 import webbrowser
