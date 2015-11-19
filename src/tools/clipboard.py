@@ -1,16 +1,15 @@
-import shlex
-from subprocess import Popen, PIPE
 import tools.platform
-
+from subprocess import Popen, PIPE
 
 class Clipboard(tools.platform.Platform):
-
     def __init__(self):
         self.set = lambda data: None
         self.get = lambda: None
         super().__init__()
 
     def init_linux(self):
+        import shlex
+
         def s(data):
             cmd = shlex.split("xclip -selection clipboard")
             p = Popen(cmd, stdin=PIPE)
@@ -29,7 +28,20 @@ class Clipboard(tools.platform.Platform):
         self.get = g
 
     def init_windows(self):
-        pass
+        from tkinter import Tk
+
+        def s(data):
+            Popen("clip", stdin=PIPE).communicate(input=bytes(data, encoding="utf-8"))
+
+        def g():
+            r = Tk()
+            r.withdraw()
+            data = r.clipboard_get()
+            r.destroy()
+            return data
+
+        self.set = s
+        self.get = g
 
     def init_osx(self):
         pass
