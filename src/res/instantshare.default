@@ -2,6 +2,7 @@
 storage = googledrive
 audio_dir = audio
 screenshot_dir = Screenshots
+cb_autocopy = True
 
 [dropbox]
 app_key = 81glnb2w8xfo0lz

@@ -28,7 +28,11 @@ class InstantShare:
             self.screen.take_screenshot_whole(file)
         url = self.storage_provider.upload(file)
         logging.info("Uploaded file to: %s", url)
-        webbrowser.open_new_tab(url)
+        if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
+            import tools.clipboard
+            tools.clipboard.Clipboard().set(url)
+        else:
+            webbrowser.open_new_tab(url)
 
 
 if __name__ == "__main__":
