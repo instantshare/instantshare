@@ -7,10 +7,11 @@ Currently supported are:
 
 - Dropbox
 - Google Drive
+- SFTP
 
 Services to be added in the future:
 
-- FTP, SFTP
+- FTP
 - Owncloud (once their API gets updated to Python 3)
 - maybe a specialized self-made Webservice
 - ...
@@ -35,6 +36,9 @@ Windows
 .. code-block:: bash
   
     $ pip install -r requirements.txt
+
+If you have issues installing the paramiko requirement, try running the paramikofix.py and rerun the paramiko installation.
+(Thanks to user3849304 on http://stackoverflow.com/questions/24804829/another-one-about-pycrypto-and-paramiko)
 
 Linux
 -----
