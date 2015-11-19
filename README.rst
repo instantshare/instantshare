@@ -4,12 +4,14 @@ instantshare
 Tool for taking screenshots and instantly sharing them using a number of services.
 
 Currently supported are:
+
 - Dropbox
 - Google Drive
 
 Services to be added in the future:
+
 - FTP, SFTP
-- Owncloud
+- Owncloud (once their API gets updated to Python 3)
 - maybe a specialized self-made Webservice
 - ...
 
@@ -37,7 +39,7 @@ Windows
 Linux
 -----
 - Install Python 3.5 using your package manager if it does not come with your distro
-- Install gnome-screenshot using your package manager
+- Install gnome-screenshot and xclip using your package manager
 - Install dependencies using pip (if pip is not installed yet, install python-pip using your package manager)
 - You might need to manually change the permissions of the cacerts.txt file used by httplib2 to 644.
 
