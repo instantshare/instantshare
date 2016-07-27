@@ -6,16 +6,13 @@ os.chdir(os.path.dirname(__file__))
 from tempfile import gettempdir
 from time import strftime
 from tools.config import CONFIG
-from tools.screenshot import Screen
-
-# import * because its __init__.py needs to be evaluated
-from storage import *
 
 
 class InstantShare:
     def __init__(self):
-        self.screen = Screen()
-        self.storage_provider = storage_providers[CONFIG.get(CONFIG.general, "storage")]()
+        import importlib
+        self.screen = importlib.import_module("screenshot.%s" % CONFIG.get(CONFIG.general, "screenshot_tool"))
+        self.storage_provider = importlib.import_module("storage.%s" % CONFIG.get(CONFIG.general, "storage"))
 
     def take_screenshot(self, crop=True):
         file = "{}/instantscreen_{}.png".format(gettempdir(), strftime("%Y-%m-%d_%H-%I-%S"))
