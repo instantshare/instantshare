@@ -15,9 +15,17 @@ def take_screenshot_crop(path):
 
     _, _, width, height = pimage.getbbox()
 
+    displays = _r.get_display_monitors()
+    leftmost, topmost = 0, 0
+    for d in displays:
+        if d[0] < leftmost:
+            leftmost = d[0]
+        if d[1] < topmost:
+            topmost = d[1]
+
     root = Tk()  # Creates a Tkinter window
     root.overrideredirect(True)  # Makes the window borderless
-    root.geometry("{0}x{1}+0+0".format(width, height))  # Makes the window the same size as the taken screenshot
+    root.geometry("{0}x{1}+{2}+{3}".format(width, height, leftmost, topmost))  # Makes the window the same size as the taken screenshot
     root.config(cursor="crosshair")  # Sets the cursor to a crosshair
 
     pimage_tk = ImageTk.PhotoImage(pimage)  # Converts the PIL.Image into a Tkinter compatible PhotoImage
