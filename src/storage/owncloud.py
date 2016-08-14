@@ -1,28 +1,31 @@
 import owncloud
-from storage.storage import Storage
 from tools.config import CONFIG
 import ntpath
 
+_name = "owncloud"
 
-class Owncloud(Storage):
 
-    def initialize(self):
-        owncloud_url = CONFIG.get("Owncloud", "url")
-        # TODO: prompt user for password using QT dialog
-        user = CONFIG.get("Owncloud", "username")
-        pw = CONFIG.get("Owncloud", "password")
+def upload(file: str) -> str:
+    owncloud_url = CONFIG.get(_name, "url")
 
-        assert owncloud_url and user and pw
-        self.oc = owncloud.Client(owncloud_url)
-        self.oc.login(user, pw)
+    # TODO: prompt user for password using QT dialog
+    user = CONFIG.get(_name, "username")
+    pw = CONFIG.get(_name, "password")
 
-    def upload(self, file: str) -> str:
-        dir = CONFIG.get("General", "screenshot_dir")
-        try:
-            self.oc.mkdir(dir)
-        except:
-            pass
-        remotefile = "{}/{}".format(dir, ntpath.basename(file))
-        self.oc.put_file(remotefile, file)
-        link = self.oc.share_file_with_link(remotefile)
-        return link
+    assert owncloud_url and user and pw
+    oc = owncloud.Client(owncloud_url)
+    oc.login(user, pw)
+
+    # find or create screenshot directory
+    dir = CONFIG.get(CONFIG.general, "screenshot_dir")
+    try:
+        oc.mkdir(dir)
+    except:
+        pass
+    remotefile = "{}/{}".format(dir, ntpath.basename(file))
+
+    # upload file
+    oc.put_file(remotefile, file)
+    link = oc.share_file_with_link(remotefile)
+
+    return link
