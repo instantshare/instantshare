@@ -1,37 +1,41 @@
 #!/usr/bin/env python3
-from time import strftime
-import webbrowser
 
+# do prep work before importing other modules
+import os
+os.chdir(os.path.dirname(__file__))
+from tempfile import gettempdir
+from time import strftime
 from tools.config import CONFIG
-from storage import *
-from tools.screenshot import Screen
 
 
 class InstantShare:
     def __init__(self):
-        self.screen = Screen()
-        # initialize storage
-        storage_providers = {
-            "dropbox": dropbox.Dropbox(),
-            "googledrive": googledrive.GoogleDrive(),
-            "test": test.Test()
-        }
-        self.storage = storage_providers[CONFIG.get("General", "storage")]
-        self.storage.initialize()
+        import importlib
+        self.screen = importlib.import_module("screenshot.%s" % CONFIG.get(CONFIG.general, "screenshot_tool"))
+        self.storage_provider = importlib.import_module("storage.%s" % CONFIG.get(CONFIG.general, "storage"))
 
     def take_screenshot(self, crop=True):
-        file = CONFIG.get("General", "tmpdir") + "instantscreen_{}.png".format(strftime("%Y-%m-%d_%H-%I-%S"))
+        file = "{}/instantscreen_{}.png".format(gettempdir(), strftime("%Y-%m-%d_%H-%I-%S"))
         if crop:
             self.screen.take_screenshot_crop(file)
         else:
             self.screen.take_screenshot_whole(file)
-        url = self.storage.upload(file)
-        print(url)
-        webbrowser.open_new_tab(url)
+        url = self.storage_provider.upload(file)
+        logging.info("Uploaded file to: %s", url)
+        if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
+            import tools.clipboard
+            tools.clipboard.Clipboard().set(url)
+        else:
+            import webbrowser
+            webbrowser.open_new_tab(url)
 
 
 if __name__ == "__main__":
     import argparse
+    import logging
+    # logging.basicConfig(filename="instantshare.log", level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s\t%(levelname)s:\t%(message)s")
+
     # parse arguments
     parser = argparse.ArgumentParser(description="Take a screenshot and upload it.")
     # dest defines the name of the key in the dictionary.
@@ -50,6 +54,7 @@ if __name__ == "__main__":
     if args["tray"]:
         from gui.traymenu import Tray
         from tools.toolbox import delay_execution
+        logging.info("InstantShare started in \"tray\" mode")
 
         # define callbacks for menu items in system tray context menu
         tray_callbacks = (
@@ -61,6 +66,8 @@ if __name__ == "__main__":
         tm = Tray(*tray_callbacks)
         tm.show()
     elif args["whole"]:
+        logging.info("InstantShare started in \"whole screen\" mode")
         app.take_screenshot(crop=False)
     else:
+        logging.info("InstantShare started in \"crop\" mode")
         app.take_screenshot(crop=True)

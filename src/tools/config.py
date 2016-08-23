@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from tempfile import gettempdir
+import logging
 from os import path
 
 
@@ -15,8 +15,9 @@ class Config(ConfigParser):
         2. Only call read if you want it to read the file again
         3. Only call write if you made configuration changes and want to save them
     """
-
+    general = "General"
     _file = "instantshare.conf"
+    _default = "res/instantshare.default"
 
     def __init__(self):
         super().__init__()
@@ -24,27 +25,9 @@ class Config(ConfigParser):
 
     def __default_config(self):
         # sane default configuration
-        params = {
-            "General": {
-                "tmpdir": gettempdir() + "/",
-                "screenshot_dir": "Screenshots",
-                "audio_dir": "AudioSnippets",
-                "storage": "googledrive"
-            },
-            "dropbox": {
-                "access_token": "0",
-                "user_id": "0"
-            },
-            "googledrive": {
-
-            }
-        }
-        # write configuration to file
-        for section in params:
-            self.add_section(section)
-            for option in params[section]:
-                self.set(section, option, params[section][option])
-        self.write()
+        with open(Config._default) as _in, open(Config._file, "w") as _out:
+            _out.write(_in.read())
+        self.read()
 
     def read(self):
         try:
@@ -52,7 +35,7 @@ class Config(ConfigParser):
                 raise IOError
             super().read([self._file])
         except IOError as e:
-            print(e)
+            logging.error(e)
             # No config file, create one with default values
             self.__default_config()
 

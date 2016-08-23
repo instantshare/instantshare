@@ -14,7 +14,8 @@ setup(
     install_requires=[
         "dropbox",
         "google-api-python-client",
-        "pillow"
+        "pillow",
+        "paramiko"
     ],
     packages=["src", "src.screenshot", "src.storage", "src.tools"]
 )
