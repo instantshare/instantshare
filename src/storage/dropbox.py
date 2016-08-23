@@ -10,7 +10,34 @@ from tools.oauthtool import implicit_flow
 _name = "dropbox"
 
 
-def _authorize():
+def upload(file: str) -> str:
+    # TODO: Use another way to find out if the access token is valid
+    # FIXME: Check for authorization failure
+    if CONFIG.get(_name, "access_token") == "0":
+        __authorize()
+
+    access_token = CONFIG.get(_name, "access_token")
+    account_id = CONFIG.get(_name, "user_id")
+
+    dropbox_client = dropbox.Dropbox(access_token)
+    dropbox_filepath = "/" + CONFIG.get(CONFIG.general, "screenshot_dir") + "/" + ntpath.basename(file)
+    file_object = open(file, 'rb')
+
+    try:
+        file_metadata = dropbox_client.files_upload(file_object, dropbox_filepath, mode=WriteMode("overwrite", None),
+                                                    client_modified=None, mute=False)
+    except dropbox.exceptions.ApiError as e:
+        logging.error("Upload failed. Error message: {0}".format(e.error_msg))
+
+    try:
+        url = dropbox_client.sharing_create_shared_link_with_settings(dropbox_filepath, None).url
+    except dropbox.exceptions.ApiError as e:
+        logging.error("Could not create shared link. Error message: {0}".format(e.error_msg))
+
+    return __validate_url(url)
+
+
+def __authorize():
     authorization_endpoint = "https://www.dropbox.com/oauth2/authorize"
     app_key = CONFIG.get(_name, "app_key")
     app_secret = CONFIG.get(_name, "app_secret")
@@ -31,27 +58,11 @@ def _authorize():
     return True
 
 
-def upload(file: str) -> str:
-    # TODO: Use another way to find out if the access token is valid
-    if CONFIG.get(_name, "access_token") == "0":
-        _authorize()
+def __validate_url(url):
+    suffix = "dl=0"
+    raw_suffix = "raw=1"
 
-    access_token = CONFIG.get(_name, "access_token")
-    account_id = CONFIG.get(_name, "user_id")
-
-    dropbox_client = dropbox.Dropbox(access_token)
-    dropbox_filepath = "/" + CONFIG.get(CONFIG.general, "screenshot_dir") + "/" + ntpath.basename(file)
-    file_object = open(file, 'rb')
-
-    try:
-        file_metadata = dropbox_client.files_upload(file_object, dropbox_filepath, mode=WriteMode("overwrite", None),
-                                                    client_modified=None, mute=False)
-    except dropbox.exceptions.ApiError as e:
-        logging.error("Upload failed. Error message: {0}".format(e.error_msg))
-
-    try:
-        url = dropbox_client.sharing_create_shared_link_with_settings(dropbox_filepath, None).url
-    except dropbox.exceptions.ApiError as e:
-        logging.error("Could not create shared link. Error message: {0}".format(e.error_msg))
+    if url.endswith(suffix):
+        url = url.replace(suffix, raw_suffix)
 
     return url
