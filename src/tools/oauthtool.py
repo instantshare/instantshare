@@ -1,6 +1,6 @@
-from http.server import CGIHTTPRequestHandler, HTTPServer
 import threading
 import webbrowser
+from http.server import CGIHTTPRequestHandler, HTTPServer
 
 
 class OAuthRequestHandler(CGIHTTPRequestHandler):
@@ -9,21 +9,19 @@ class OAuthRequestHandler(CGIHTTPRequestHandler):
         p = str(self.path)
         if p == "/":
             # write out js which filters the hash part of the url and redirects to /auth
-            self.write_out("../res/redirect.html")
+            self.write_out("res/redirect.html")
         elif p.startswith("/auth?"):
-            # parse parameters
+            # parse return parameters
             pstrings = p[6:].split("&")
             pdict = {}
             for pstring in pstrings:
                 param = pstring.split("=")
                 pdict[param[0]] = param[1]
-            self.server._access_token = (
-                pdict["access_token"],
-                pdict["token_type"],
-                pdict["expires_in"]
-            )
+
+            self.server._access_token = pdict
+
             # write out success page
-            self.write_out("../res/completed.html")
+            self.write_out("res/completed.html")
             # kill the server from a seperate thread
             killer = threading.Thread(target=self.server.shutdown)
             killer.daemon = True
@@ -53,7 +51,7 @@ class OAuthServer(HTTPServer):
                 continue
             else:
                 break
-        self._access_token = None  # (access_token, token_type, expires_in)
+        self._access_token = None  # output differs with different OAuth providers
 
     def wait_for_redirect(self):
         """
@@ -64,26 +62,50 @@ class OAuthServer(HTTPServer):
         return self._access_token
 
 
-def implicit_flow(base_url, client_id, scopes: list):
+def implicit_flow(base_url, client_id, state = None, scope: list = None):
     """
-    Executes the OAuth2 implicit flow for the given base url and client id.
-    :param base_url:
-    :param client_id:
-    :return: (access_token, token_type, expires_in)
+    Executes the OAuth2 implicit grant flow for the given base url and client id.
+    :param base_url: The base URL of OAuth provider
+    :param client_id: The client identifier for OAuth provider
+    :param state: OPTIONAL An opaque value used by the client to maintain state between the request and callback. The
+    authorization server includes this value when redirecting the user-agent back to the client.
+    :param scope: OPTIONAL The scope of the access request
+    :return:
     """
-    s = OAuthServer()
-    callback_url = "http://localhost:{}/".format(s.server_port)
 
-    url = "{0}?response_type=token&client_id={1}&redirect_uri={2}&scope={3}".format(
-        base_url, client_id, callback_url, "%20".join(scopes)
+    # Start local OAuthServer to pass redirect to
+    oauth_server = OAuthServer()
+    redirect_uri = "http://localhost:{}/".format(oauth_server.server_port)
+
+    # Create URL
+    url = (
+        "{0}?response_type=token&client_id={1}&redirect_uri={2}"
+            .format(base_url, client_id, redirect_uri)
     )
+
+    # Add optional GET parameters to URL based on given optional function parameters
+    # scope
+    if scope is not None:
+        url += str("&scope={0}".format("%20".join(scope)))
+    # state
+    if state is not None:
+        url += str("&state={0}".format(state))
+
     webbrowser.open(url)
-    return s.wait_for_redirect()
+    return oauth_server.wait_for_redirect()
 
 """ Test:
 print(implicit_flow(
     "https://accounts.google.com/o/oauth2/auth",
     "774886165931-ks0ntcb32p1mhi0nnv8tcmob81e0oetj.apps.googleusercontent.com",
+    None,
     ["https://www.googleapis.com/auth/drive"]
+))
+"""
+
+""" Test:
+print(implicit_flow(
+    "https://www.dropbox.com/oauth2/authorize",
+    "81glnb2w8xfo0lz"
 ))
 """
