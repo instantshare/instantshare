@@ -1,5 +1,5 @@
 [General]
-storage = googledrive
+storage = googledrive OR sftp OR dropbox
 audio_dir = audio
 screenshot_dir = Screenshots
 cb_autocopy = True
@@ -22,7 +22,12 @@ username = 0
 password = 0
 
 [sftp]
-username = 0
-password = 0
 hostname = example.com
 port = 22
+username = 0
+authentication_type = password OR key
+# Authentication type password
+password = 0
+# Authentication type key
+key_passphrase = 0
+key_filepath = 0
