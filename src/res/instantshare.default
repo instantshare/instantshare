@@ -24,6 +24,8 @@ password = 0
 
 [sftp]
 hostname = example.com
+# Base directory for files (. is home directory of user)
+base_dir = .
 port = 22
 username = 0
 authentication_type = password OR key

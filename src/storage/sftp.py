@@ -13,11 +13,24 @@ HOSTNAME = CONFIG.get(_name, "hostname")
 PORT = CONFIG.getint(_name, "port")
 USERNAME = CONFIG.get(_name, "username")
 AUTHENTICATION_TYPE = CONFIG.get(_name, "authentication_type")
+SFTP_BASE_DIR = CONFIG.get(_name, "base_dir")
+
+
+# The provided user for SFTP upload must have read and write permissions in the SFTP_BASE_DIR
+# (The SFTP_BASE_DIR has to exist, the user doesn't need permissions in the parent directory).
+# A lack of permissions in SFTP_BASE_DIR will break the SFTP upload functionality.
 
 
 def upload(file: str):
     # Upload preparations
     transport, sftp_client = _connect()
+    try:
+        sftp_client.chdir(SFTP_BASE_DIR)
+    except IOError as e:
+        logging.error(
+            "Can not change into base directory. Please provide a working base directory in your SFTP configuration.")
+        sys.exit(0)
+
     screenshot_dir = CONFIG.get(CONFIG.general, "screenshot_dir")
     sftp_filepath = screenshot_dir + "/" + ntpath.basename(file)
 
@@ -35,7 +48,7 @@ def upload(file: str):
     sftp_client.close()
     transport.close()
 
-    return HOSTNAME + "/" + sftp_filepath
+    return "http://" + HOSTNAME + "/" + sftp_filepath
 
 
 def _create_dir_if_not_exists(directory_name, sftp_client):
