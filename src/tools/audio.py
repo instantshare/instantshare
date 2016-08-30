@@ -6,7 +6,7 @@ CHUNK = 1024
 
 def play_notification():
     # open the wave file
-    wf = wave.open("res\\notification.wav", 'rb')
+    wf = wave.open("res/notification.wav", 'rb')
 
     # instantiate the PyAudio object
     p = pyaudio.PyAudio()
