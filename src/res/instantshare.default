@@ -3,8 +3,7 @@ storage = googledrive OR sftp OR dropbox
 audio_dir = audio
 screenshot_dir = Screenshots
 cb_autocopy = True
-notification_clipboard = True
-notification_webbrowser = False
+notification_sound = True
 
 [dropbox]
 app_key = 81glnb2w8xfo0lz

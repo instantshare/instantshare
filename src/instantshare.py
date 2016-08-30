@@ -26,13 +26,12 @@ class InstantShare:
         if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
             import tools.clipboard
             tools.clipboard.Clipboard().set(url)
-            if CONFIG.getboolean(CONFIG.general, "notification_clipboard"):
-                audio.play_notification()
         else:
             import webbrowser
             webbrowser.open_new_tab(url)
-            if CONFIG.getboolean(CONFIG.general, "notification_webbrowser"):
-                audio.play_notification()
+        if CONFIG.getboolean(CONFIG.general, "notification_sound"):
+            audio.play_notification()
+
 
 
 if __name__ == "__main__":
