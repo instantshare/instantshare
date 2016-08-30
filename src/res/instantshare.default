@@ -1,5 +1,5 @@
 [General]
-storage = googledrive OR sftp OR dropbox
+storage = googledrive OR sftp OR dropbox OR imgur
 audio_dir = audio
 screenshot_dir = Screenshots
 cb_autocopy = True
@@ -32,3 +32,6 @@ password = 0
 # Authentication type key
 key_passphrase = 0
 key_filepath = 0
+
+[imgur]
+client_id = a5e814c239e21f0
