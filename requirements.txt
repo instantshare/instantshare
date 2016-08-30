@@ -2,3 +2,4 @@ paramiko>=2.0.0
 dropbox
 google-api-python-client
 pillow
+pyaudio

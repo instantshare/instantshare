@@ -6,6 +6,7 @@ os.chdir(os.path.dirname(__file__))
 from tempfile import gettempdir
 from time import strftime
 from tools.config import CONFIG
+import tools.audio
 
 
 class InstantShare:
@@ -25,9 +26,11 @@ class InstantShare:
         if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
             import tools.clipboard
             tools.clipboard.Clipboard().set(url)
+            tools.audio.play_notification()
         else:
             import webbrowser
             webbrowser.open_new_tab(url)
+            tools.audio.play_notification()
 
 
 if __name__ == "__main__":
