@@ -54,7 +54,6 @@ def _authorize():
 
     # FIXME: Don't save access token in unencrypted config file
     CONFIG.set(_name, "access_token", auth_response["access_token"])
-    CONFIG.set(_name, "account_id", auth_response["account_id"])
     CONFIG.write()
 
     return True
