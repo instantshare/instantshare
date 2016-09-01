@@ -1,4 +1,5 @@
 paramiko>=2.0.0
+cryptography
 dropbox
 google-api-python-client
 imgurpython

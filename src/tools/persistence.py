@@ -1,24 +1,18 @@
 import logging
 import pickle
 
-
-def _encrypted(data, key):
-    # TODO implement encryption
-    return data
-
-
-def _decrypted(data, key):
-    # TODO implement decryption
-    return data
+from tools.encryption import SymmetricKey
 
 
 class KVStore(dict):
 
-    def __init__(self, module_name="general", key=None):
+    def __init__(self, module_name="general", pw=None):
         super().__init__()
         self._filepath = "data/" + module_name
-        self._encrypted = key is not None
-        self._key = key
+        self._encrypted = pw is not None
+
+        if self._encrypted:
+            self._key = SymmetricKey(pw)
 
         # try to load persistent data
         data = None
@@ -36,7 +30,7 @@ class KVStore(dict):
             if self._encrypted:
                 try:
                     # decrypt binary data and deserialize
-                    data = validate(pickle.loads(_decrypted(binary_data, key)))
+                    data = validate(pickle.loads(self._key.decrypt(binary_data)))
                 except pickle.UnpicklingError:
                     # data was not encrypted yet
                     data = pickle.loads(binary_data)
@@ -60,7 +54,7 @@ class KVStore(dict):
         data.update(self)
         bytes = pickle.dumps(data)
         with open(self._filepath, mode="wb") as file:
-            if self._key is None:
-                file.write(bytes)
+            if self._encrypted:
+                file.write(self._key.encrypt(bytes))
             else:
-                file.write(_encrypted(bytes, self._key))
+                file.write(bytes)
