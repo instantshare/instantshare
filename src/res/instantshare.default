@@ -1,8 +1,22 @@
 [General]
-storage = googledrive OR sftp OR dropbox OR imgur
-audio_dir = audio
+
+# The hoster you want to upload your screenshots to.
+# Possible Values: imgur, dropbox, googledrive, sftp
+storage = imgur
+
+# The base directory name for screenshots when using hosters like dropbox
 screenshot_dir = Screenshots
+
+# The screenshot tool to use. The name corresponds to the name of the python modules in the screenshot package.
+# Possible Values: windows_tk (Windows only), gnome_screenshot (Linux only)
+screenshot_tool = $SCREENSHOT_TOOL
+
+# Whether or not to automatically copy the public URL to the uploaded medium to the clipboard.
+# Possible Values: True, False
 cb_autocopy = True
+
+# Whether or not to play the notification sound when the upload is done.
+# Possible Values: True, False
 notification_sound = True
 
 [dropbox]
