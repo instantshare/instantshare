@@ -2,6 +2,9 @@
 
 # do prep work before importing other modules
 import os
+
+from tools.hotkey import Hotkey
+
 os.chdir(os.path.dirname(__file__))
 from tempfile import gettempdir
 from time import strftime
@@ -60,14 +63,17 @@ if __name__ == "__main__":
         from tools.toolbox import delay_execution
         logging.info("InstantShare started in \"tray\" mode")
 
-        # define callbacks for menu items in system tray context menu
-        tray_callbacks = (
+        # define function callback for tray and hotkey functionality
+        function_callbacks = (
             lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=False)),
             lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=True))
         )
 
+        # enable hotkeys
+        hotkey_functionality = Hotkey(*function_callbacks)
+
         # create tray
-        tm = Tray(*tray_callbacks)
+        tm = Tray(*function_callbacks)
         tm.show()
     elif args["whole"]:
         logging.info("InstantShare started in \"whole screen\" mode")
