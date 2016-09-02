@@ -1,7 +1,7 @@
 import logging
 import pickle
 
-from tools.encryption import SymmetricKey
+import tools.encryption as crypt
 
 
 class KVStore(dict):
@@ -12,7 +12,7 @@ class KVStore(dict):
         self._encrypted = pw is not None
 
         if self._encrypted:
-            self._key = SymmetricKey(pw)
+            self._key = crypt.SymmetricKey(pw)
 
         # try to load persistent data
         data = None
@@ -52,9 +52,9 @@ class KVStore(dict):
     def sync(self):
         data = {}
         data.update(self)
-        bytes = pickle.dumps(data)
+        bdata = pickle.dumps(data)
         with open(self._filepath, mode="wb") as file:
             if self._encrypted:
-                file.write(self._key.encrypt(bytes))
+                file.write(self._key.encrypt(bdata))
             else:
-                file.write(bytes)
+                file.write(bdata)
