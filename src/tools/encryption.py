@@ -1,10 +1,14 @@
 import base64
 import os
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+
+class CryptoError(Exception):
+    pass
 
 
 def _derive_key(password: str) -> bytes:
@@ -33,4 +37,7 @@ class SymmetricKey:
         return self.crypto.encrypt(data)
 
     def decrypt(self, data: bytes) -> bytes:
-        return self.crypto.decrypt(data)
+        try:
+            return self.crypto.decrypt(data)
+        except InvalidToken:
+            raise CryptoError
