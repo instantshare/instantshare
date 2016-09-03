@@ -12,6 +12,7 @@ screenshot_dir = Screenshots
 screenshot_tool = $SCREENSHOT_TOOL
 
 # Whether or not to automatically copy the public URL to the uploaded medium to the clipboard.
+# When not copied to the clipboard, the URL will be opened in the web browser.
 # Possible Values: True, False
 cb_autocopy = True
 
