@@ -11,10 +11,20 @@ from oauth2client import client
 from oauth2client import tools
 import logging
 from tools.config import CONFIG
+from tools.persistence import KVStore
 
 SCOPES = 'https://www.googleapis.com/auth/drive'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Instantshare'
+
+_name = "googledrive"
+# TODO: encryption
+kvstore = KVStore(_name)
+
+# FIXME: There is several problems with this:
+# - does not use the common oauthtool
+# - does not use the implicit flow
+# - saves data in arbitrary locations
 
 
 def upload(file: str) -> str:

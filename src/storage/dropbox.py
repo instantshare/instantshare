@@ -6,21 +6,23 @@ from dropbox.files import WriteMode
 
 from tools.config import CONFIG
 from tools.oauthtool import implicit_flow
+from tools.persistence import KVStore
 
 _name = "dropbox"
+# TODO: encryption
+kvstore = KVStore(_name)
 
 
 def upload(file: str) -> str:
     # TODO: Use another way to find out if the access token is valid
     # FIXME: Check for authorization failure
-    if CONFIG.get(_name, "access_token") == "0":
+    if "access_token" not in kvstore.keys():
         authorization_successful = _authorize()
         if not authorization_successful:
             return None  # unable to upload without successful authorization
 
-    access_token = CONFIG.get(_name, "access_token")
-
-    dropbox_client = dropbox.Dropbox(access_token)
+    token = kvstore["access_token"]
+    dropbox_client = dropbox.Dropbox(token)
     dropbox_filepath = "/" + CONFIG.get(CONFIG.general, "screenshot_dir") + "/" + ntpath.basename(file)
     file_object = open(file, 'rb')
 
@@ -52,10 +54,8 @@ def _authorize():
         logging.error("Authentication failed. Error message: {0}".format(auth_response["error_description"]))
         return False
 
-    # FIXME: Don't save access token in unencrypted config file
-    CONFIG.set(_name, "access_token", auth_response["access_token"])
-    CONFIG.set(_name, "account_id", auth_response["account_id"])
-    CONFIG.write()
+    kvstore["access_token"] = auth_response["access_token"]
+    kvstore.sync()
 
     return True
 
