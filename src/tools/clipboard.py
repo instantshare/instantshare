@@ -1,7 +1,8 @@
-import tools.platform
+from tools.toolbox import Platform
 from subprocess import Popen, PIPE
 
-class Clipboard(tools.platform.Platform):
+
+class Clipboard(Platform):
     def __init__(self):
         self.set = lambda data: None
         self.get = lambda: None
