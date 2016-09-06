@@ -20,6 +20,10 @@ cb_autocopy = True
 # Possible Values: True, False
 notification_sound = True
 
+[hotkeys]
+screenshot_crop = Lcontrol+Lshift+2
+screenshot_whole = Lcontrol+Lshift+3
+
 [dropbox]
 app_key = 81glnb2w8xfo0lz
 auth_url = 0
