@@ -1,5 +1,7 @@
 from tkinter import Tk, Canvas
+
 from PIL import ImageTk
+
 from screenshot.pyrobot import Robot
 
 _r = Robot()
@@ -50,7 +52,7 @@ def take_screenshot_crop(path):
 
     # Cancels screen capture
     def cancel(event):
-        if event.keycode is 27: # cancel when pressing ESC
+        if event.keycode == 27:  # cancel when pressing ESC
             root.destroy()
 
     # Saves the image when the user releases the left mouse button
