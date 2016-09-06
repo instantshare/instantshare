@@ -1,7 +1,7 @@
 import threading
 
 from tools.config import CONFIG
-from tools.platform import Platform
+from tools.toolbox import Platform
 
 _name = "hotkeys"
 
