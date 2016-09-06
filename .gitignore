@@ -62,6 +62,8 @@ target/
 # Configuration Files
 .conf
 
+data/
+
 # files that should never be committed
 src/client_secret.json
 src/instantshare.conf

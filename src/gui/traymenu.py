@@ -1,6 +1,6 @@
 import threading
 
-from tools.platform import Platform
+from tools.toolbox import Platform
 
 
 class Tray(Platform):
