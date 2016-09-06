@@ -11,6 +11,7 @@
 
 import os
 import win32api
+
 import win32con
 import win32gui_struct
 
@@ -31,6 +32,7 @@ class SysTrayIcon(object):
                  icon,
                  hover_text,
                  menu_options,
+                 event_queue,
                  on_quit=None,
                  default_menu_index=None,
                  window_class_name=None, ):
@@ -38,6 +40,7 @@ class SysTrayIcon(object):
         self.icon = icon
         self.hover_text = hover_text
         self.on_quit = on_quit
+        self.event_queue = event_queue
 
         menu_options = menu_options + (('Quit', None, self.QUIT),)
         self._next_action_id = self.FIRST_ID
@@ -210,7 +213,7 @@ class SysTrayIcon(object):
         if menu_action == self.QUIT:
             win32gui.DestroyWindow(self.hwnd)
         else:
-            menu_action(self)
+            self.event_queue.put(menu_action(self))
 
 
 def non_string_iterable(obj):

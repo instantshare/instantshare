@@ -2,6 +2,7 @@
 
 # do prep work before importing other modules
 import os
+from queue import Queue
 
 from tools.hotkey import Hotkey
 
@@ -69,6 +70,9 @@ if __name__ == "__main__":
         from tools.toolbox import delay_execution
         logging.info("InstantShare started in \"tray\" mode")
 
+        # Event Queue for main thread
+        event_queue = Queue()
+
         # define function callback for tray and hotkey functionality
         function_callbacks = (
             lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=False)),
@@ -76,11 +80,17 @@ if __name__ == "__main__":
         )
 
         # enable hotkeys
-        hotkey_functionality = Hotkey(*function_callbacks)
+        hotkey = Hotkey(event_queue, *function_callbacks)
+        hotkey.listen()
 
         # create tray
-        tm = Tray(*function_callbacks)
+        tm = Tray(event_queue, *function_callbacks)
         tm.show()
+
+        while True:
+            event = event_queue.get()
+            event()
+
     elif args["whole"]:
         logging.info("InstantShare started in \"whole screen\" mode")
         app.take_screenshot(crop=False)
