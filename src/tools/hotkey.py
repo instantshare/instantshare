@@ -7,15 +7,15 @@ _name = "hotkeys"
 
 
 class Hotkey(Platform):
-    # TODO: Parsing of composite hotkey
-    HOTKEY_WHOLE = CONFIG.get(_name, "screenshot_whole")
-    HOTKEY_CROP = CONFIG.get(_name, "screenshot_crop")
+    HOTKEY_WHOLE = set(CONFIG.get(_name, "screenshot_whole").split("+"))
+    HOTKEY_CROP = set(CONFIG.get(_name, "screenshot_crop").split("+"))
 
     def __init__(self, event_queue, screenshot_whole, screenshot_crop):
         self.event_queue = event_queue
         self.screenshot_whole = screenshot_whole
         self.screenshot_crop = screenshot_crop
         self.listen = lambda: None
+
         super().__init__()
 
     def init_osx(self):
@@ -29,10 +29,10 @@ class Hotkey(Platform):
 
         def handle_events(args):
             if isinstance(args, KeyboardEvent):
-                if self.HOTKEY_WHOLE in args.pressed_key and args.event_type == "key down":
+                if self.HOTKEY_WHOLE.issubset(args.pressed_key) and args.event_type == "key down":
                     self.event_queue.put(self.screenshot_whole)
 
-                if self.HOTKEY_CROP in args.pressed_key and args.event_type == 'key down':
+                if self.HOTKEY_CROP.issubset(args.pressed_key) and args.event_type == 'key down':
                     self.event_queue.put(self.screenshot_crop)
 
         def listen():
