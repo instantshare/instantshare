@@ -38,7 +38,7 @@ class Hotkey(Platform):
         def listen():
             hk = Hook()  # make a new instance of PyHooked
             hk.handler = handle_events  # add callback for occuring events
-            thread = threading.Thread(target=hk.hook)
+            thread = threading.Thread(target=hk.hook, daemon=True)
             thread.start()  # start listening on new thread
 
         self.listen = listen

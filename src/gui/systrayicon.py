@@ -10,6 +10,7 @@
 #              win32gui_taskbar.py and win32gui_menu.py demos from PyWin32
 
 import os
+import sys
 import win32api
 
 import win32con
@@ -211,7 +212,7 @@ class SysTrayIcon(object):
     def execute_menu_option(self, id):
         menu_action = self.menu_actions_by_id[id]
         if menu_action == self.QUIT:
-            win32gui.DestroyWindow(self.hwnd)
+            self.event_queue.put(lambda: sys.exit(0))
         else:
             self.event_queue.put(menu_action(self))
 

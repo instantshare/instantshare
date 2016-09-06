@@ -22,7 +22,8 @@ class Tray(Platform):
 
         def show():
             thread = threading.Thread(
-                target=lambda: SysTrayIcon("res/instantshare.ico", "InstantShare", menu_options, self.event_queue))
+                target=lambda: SysTrayIcon("res/instantshare.ico", "InstantShare", menu_options, self.event_queue),
+                daemon=True)
             thread.start()
 
         self.show = show
