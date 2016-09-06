@@ -1,7 +1,5 @@
 import threading
 
-from pyhooked import KeyboardEvent, Hook
-
 from tools.config import CONFIG
 from tools.platform import Platform
 
@@ -27,6 +25,8 @@ class Hotkey(Platform):
         pass
 
     def init_windows(self):
+        from pyhooked import KeyboardEvent, Hook
+
         def handle_events(args):
             if isinstance(args, KeyboardEvent):
                 if self.HOTKEY_WHOLE in args.pressed_key and args.event_type == "key down":
