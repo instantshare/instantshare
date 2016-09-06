@@ -24,6 +24,12 @@ class InstantShare:
             self.screen.take_screenshot_crop(file)
         else:
             self.screen.take_screenshot_whole(file)
+
+        if not os.path.isfile(file):
+            # Capture screen cancelled
+            logging.debug("Screen capture cancelled.")
+            return
+
         url = self.storage_provider.upload(file)
         logging.info("Uploaded file to: %s", url)
         if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
