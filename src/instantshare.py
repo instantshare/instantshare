@@ -4,12 +4,11 @@
 import os
 from queue import Queue
 
-from tools.hotkey import Hotkey
-
 os.chdir(os.path.dirname(__file__))
 from tempfile import gettempdir
 from time import strftime
 from tools.config import CONFIG
+from tools.hotkey import Hotkey
 from tools import audio
 
 
