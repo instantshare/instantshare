@@ -20,10 +20,21 @@ Options:
 from docopt import docopt, printable_usage
 from importlib import import_module
 
+import os
 import sys
+import logging
 
 
 __commands__ = ["screen", "text", "video", "audio", "file", "gui"]
+
+
+def _setup_logging(level=logging.INFO, filename=None):
+    fmtstr = "%(asctime)s\t%(levelname)s:\t%(message)s"
+    if filename:
+        # TODO: Issue #20
+        logging.basicConfig(filename=filename, level=level, format=fmtstr)
+    else:
+        logging.basicConfig(level=level, format=fmtstr)
 
 
 def _get_module(cmd):
@@ -38,6 +49,8 @@ def _get_module(cmd):
 
 
 def main():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # TODO: Issue #20
+    _setup_logging()
     args = docopt(__doc__, options_first=True)
     if args["--help"]:
         print(__doc__)
