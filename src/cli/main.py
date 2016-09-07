@@ -38,6 +38,7 @@ def _setup_logging(level=logging.INFO, filename=None):
 
 
 def _get_module(cmd):
+
     if cmd is None:
         print(printable_usage(__doc__))
         sys.exit(1)
@@ -49,8 +50,12 @@ def _get_module(cmd):
 
 
 def main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # TODO: Issue #20
+    # TODO: Issue #20
+    project_home = os.path.dirname(os.path.abspath(__file__)) + "/.."
+    os.chdir(project_home)
+
     _setup_logging()
+
     args = docopt(__doc__, options_first=True)
     if args["--help"]:
         print(__doc__)
