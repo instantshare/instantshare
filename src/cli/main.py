@@ -45,7 +45,7 @@ def _get_module(cmd):
         print("Command not found. Available commands: " + ", ".join(__commands__))
         sys.exit(1)
     else:
-        return import_module(cmd, ".")
+        return import_module(__package__ + "." + cmd)
 
 
 def main():
