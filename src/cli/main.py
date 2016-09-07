@@ -31,7 +31,6 @@ __commands__ = ["screen", "text", "video", "audio", "file", "gui"]
 def _setup_logging(level=logging.INFO, filename=None):
     fmtstr = "%(asctime)s\t%(levelname)s:\t%(message)s"
     if filename:
-        # TODO: Issue #20
         logging.basicConfig(filename=filename, level=level, format=fmtstr)
     else:
         logging.basicConfig(level=level, format=fmtstr)
