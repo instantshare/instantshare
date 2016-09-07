@@ -13,6 +13,7 @@ from tools.config import CONFIG
 from importlib import import_module
 from tempfile import gettempdir
 from time import strftime
+import logging
 
 
 def main(argv):
@@ -35,6 +36,7 @@ def main(argv):
 
     # upload to storage
     url = storage.upload(file)
+    logging.info("Uploaded screenshot to: " + url)
 
     # execute user defined action
     if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
