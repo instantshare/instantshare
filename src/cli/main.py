@@ -68,7 +68,8 @@ def main():
     if args["<command>"] == "help":
         cmd = args["<args>"][0]
         if cmd is None:
-            print(printable_usage(__doc__))
+            print(printable_usage(__doc__), file=sys.stderr)
+            sys.exit(1)
         _execute_command([cmd, "--help"])
     else:
         argv = [args['<command>']] + args['<args>']
