@@ -1,7 +1,7 @@
 """
 Take a cropped screenshot and share its public URL.
 
-Usage: instantshare.py screen [options]
+Usage: instantshare screen [options]
 
 Options:
   -w, --whole           Take a screenshot of the whole screen instead

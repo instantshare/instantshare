@@ -1,7 +1,7 @@
 """
-Usage: instantshare.py <command> [<args>...]
-       instantshare.py [-h | --help | -v | --version]
-       instantshare.py help <command>
+Usage: instantshare <command> [<args>...]
+       instantshare [-h | --help | -v | --version]
+       instantshare help <command>
 
 Commands:
   screen         Share a screenshot of your desktop
@@ -11,7 +11,7 @@ Commands:
   file           Share any file from stdin or your clipboard
   gui            Display GUI
 
-See 'instantshare.py help <command>' for more detailed information.
+See 'instantshare help <command>' for more detailed information.
 
 Options:
   -h, --help     Print this information
