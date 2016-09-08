@@ -4,6 +4,7 @@ Take a cropped screenshot and share its public URL.
 Usage: instantshare screen [options]
 
 Options:
+  -h, --help            Print this information
   -w, --whole           Take a screenshot of the whole screen instead
   --tool=<tool>         Overwrite the screenshot_tool config parameter
   --storage=<provider>  Overwrite the storage config parameter

@@ -5,12 +5,20 @@ access instantshare's functionality.
 The GUI is also required for native hotkey support (which uses the hotkeys
 set in instantshare.conf). You can most likely also directly map hotkeys
 to commands using your operating system or desktop environment settings.
+
+Usage:  instantshare gui [options]
+
+Options:
+  -h, --help  Display this information
 """
-import logging
+from docopt import docopt
 from cli.main import execute_command
+
+import logging
 
 
 def main(argv):
+    args = docopt(__doc__, argv)
     from gui.traymenu import Tray
     from tools.toolbox import delay_execution
 
