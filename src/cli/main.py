@@ -66,10 +66,10 @@ def main():
     # TODO access centralized version information
     args = docopt(__doc__, options_first=True, version="instantshare version 0.1")
     if args["<command>"] == "help":
-        cmd = args["<args>"][0]
-        if cmd is None:
+        if len(args["<args>"]) == 0:
             print(printable_usage(__doc__), file=sys.stderr)
             sys.exit(1)
+        cmd = args["<args>"][0]
         _execute_command([cmd, "--help"])
     else:
         argv = [args['<command>']] + args['<args>']
