@@ -16,7 +16,7 @@ def main(argv):
 
     # define callbacks for menu items in system tray context menu
     tray_callbacks = (
-        lambda: delay_execution(0.3, lambda: execute_command("screen", "--whole")),
+        lambda: delay_execution(0.3, lambda: execute_command("screen --whole")),
         lambda: delay_execution(0.3, lambda: execute_command("screen"))
     )
 

@@ -22,6 +22,7 @@ from importlib import import_module
 
 import os
 import sys
+import shlex
 import logging
 
 
@@ -37,15 +38,22 @@ def _setup_logging(level=logging.INFO, filename=None):
 
 
 def _get_module(cmd):
-
     if cmd is None:
-        print(printable_usage(__doc__))
+        print(printable_usage(__doc__), file=sys.stderr)
         sys.exit(1)
     elif cmd not in __commands__:
-        print("Command not found. Available commands: " + ", ".join(__commands__))
+        print("Command not found. Available commands: " + ", ".join(__commands__), file=sys.stderr)
         sys.exit(1)
     else:
         return import_module(__package__ + "." + cmd)
+
+
+def _execute_command(argv: list):
+    _get_module(argv[0]).main(argv)
+
+
+def execute_command(cmd: str):
+    _execute_command(shlex.split(cmd))
 
 
 def main():
@@ -55,25 +63,17 @@ def main():
 
     _setup_logging()
 
-    args = docopt(__doc__, options_first=True)
-    if args["--help"]:
-        print(__doc__)
-    elif args["--version"]:
-        # TODO access centralized version information
-        print("instantshare version 0.1")
-    elif args["<command>"] == "help":
+    # TODO access centralized version information
+    args = docopt(__doc__, options_first=True, version="instantshare version 0.1")
+    if args["<command>"] == "help":
         cmd = args["<args>"][0]
-        print(_get_module(cmd).__doc__)
+        if cmd is None:
+            print(printable_usage(__doc__))
+        _execute_command([cmd, "--help"])
     else:
-        cmd = args['<command>']
-        argv = [cmd] + args['<args>']
-        _get_module(args["<command>"]).main(argv)
+        argv = [args['<command>']] + args['<args>']
+        _execute_command(argv)
 
-
-def execute_command(cmd, argv=None, *args, **kwargs):
-    if not argv:
-        argv = list(args) + ["--{}={}".format(k, v) for k, v in kwargs]
-    _get_module(cmd).main(argv)
 
 if __name__ == "__main__":
     main()

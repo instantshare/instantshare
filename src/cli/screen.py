@@ -1,5 +1,5 @@
 """
-Take a cropped screenshot and share it's public URL.
+Take a cropped screenshot and share its public URL.
 
 Usage: instantshare.py screen [options]
 
