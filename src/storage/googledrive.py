@@ -28,17 +28,21 @@ kvstore = KVStore(_name)
 
 
 def upload(file: str) -> str:
-    flags = Namespace(auth_host_name='localhost',
-                           auth_host_port=[8080, 8090],
-                           logging_level='ERROR',
-                           noauth_local_webserver=False)
+    flags = Namespace(
+        auth_host_name='localhost',
+        auth_host_port=[8080, 8090],
+        logging_level='ERROR',
+        noauth_local_webserver=False
+    )
     credentials = _get_credentials(flags)
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('drive', 'v2', http=http)
     # Returns a list of folders in the root directory with a title equaling the screenshot_dir
     results = service.files().list(
-        q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and title='" + CONFIG.get(
-            CONFIG.general, "screenshot_dir") + "'", maxResults=100).execute()
+        q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder'"
+          " and title='" + CONFIG.get(CONFIG.general, "screenshot_dir") + "'",
+        maxResults=100
+    ).execute()
     items = results.get('items', [])
 
     # Checks if the directory already exists and if not it will create it

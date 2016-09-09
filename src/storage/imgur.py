@@ -22,12 +22,13 @@ def upload(file: str) -> str:
 
     imgur_client = ImgurClient(client_id, None, None, None)
 
+    file_metadata = None
     try:
         file_metadata = imgur_client.upload_from_path(file)
     except ImgurClientError as e:
         logging.error("Upload failed. Error message: {0}".format(e.error_message))
 
-    url = file_metadata["link"]
+    url = file_metadata["link"] if file_metadata else None
     return url
 
 
