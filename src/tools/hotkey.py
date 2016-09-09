@@ -11,6 +11,11 @@ class HotkeyInUseError(Exception):
         self.error_msg = error_msg
 
 
+class InvalidHotkeyError(Exception):
+    def __init__(self, error_msg):
+        self.error_msg = error_msg
+
+
 class Hotkey(Platform):
     def __init__(self, event_queue):
         self.event_queue = event_queue
@@ -28,24 +33,30 @@ class Hotkey(Platform):
         pass
 
     def init_windows(self):
-        from pyhooked import KeyboardEvent, Hook
+        from pyhooked import ID_TO_KEY, KeyboardEvent, Hook
 
         _defined_hotkeys = {}
 
         def add_hotkey(list_of_keys, callback):
             # Use an immutable set as dictionary key (eliminates duplicate keys)
-            list_as_frozenset = frozenset(list_of_keys)
+            frozenset_of_keys = frozenset(list_of_keys)
+
+            # Raise exception when hotkey contains invalid keys
+            valid_keys = set(ID_TO_KEY.values())
+            if not frozenset_of_keys.issubset(valid_keys):
+                raise InvalidHotkeyError(
+                    "Defined hotkey '{0}' contains invalid keys or is empty.".format("+".join(frozenset_of_keys)))
 
             # Raise exception when hotkey is already in use
-            if list_as_frozenset in _defined_hotkeys:
-                raise HotkeyInUseError("Hotkey '{0}' is already in use.".format("+".join(list_as_frozenset)))
+            if frozenset_of_keys in _defined_hotkeys:
+                raise HotkeyInUseError("Hotkey '{0}' is already in use.".format("+".join(frozenset_of_keys)))
 
-            _defined_hotkeys[list_as_frozenset] = callback
+            _defined_hotkeys[frozenset_of_keys] = callback
 
         def remove_hotkey(list_of_keys):
             # Use an immutable set as dictionary key (eliminates duplicate keys)
-            frozen_set_of_keys = frozenset(list_of_keys)
-            _defined_hotkeys.pop(frozen_set_of_keys, None)
+            frozenset_of_keys = frozenset(list_of_keys)
+            _defined_hotkeys.pop(frozenset_of_keys, None)
 
         def handle_events(args):
             if isinstance(args, KeyboardEvent):

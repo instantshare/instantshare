@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     if args["tray"]:
         from gui.traymenu import Tray
-        from tools.hotkey import Hotkey, HotkeyInUseError
+        from tools.hotkey import Hotkey, HotkeyInUseError, InvalidHotkeyError
         from tools.toolbox import delay_execution
         logging.info("InstantShare started in \"tray\" mode")
 
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         try:
             hotkey_daemon.add_hotkey(HOTKEY_WHOLE, lambda: app.take_screenshot(crop=False))
             hotkey_daemon.add_hotkey(HOTKEY_CROP, lambda: app.take_screenshot(crop=True))
-        except HotkeyInUseError as e:
+        except (HotkeyInUseError, InvalidHotkeyError) as e:
             logging.warning(e.error_msg)
 
         hotkey_daemon.listen()
