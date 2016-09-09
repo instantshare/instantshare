@@ -8,7 +8,6 @@ os.chdir(os.path.dirname(__file__))
 from tempfile import gettempdir
 from time import strftime
 from tools.config import CONFIG
-from tools.hotkey import Hotkey
 from tools import audio
 
 
@@ -66,25 +65,36 @@ if __name__ == "__main__":
 
     if args["tray"]:
         from gui.traymenu import Tray
+        from tools.hotkey import Hotkey, HotkeyInUseError
         from tools.toolbox import delay_execution
         logging.info("InstantShare started in \"tray\" mode")
 
         # Event Queue for main thread
         event_queue = Queue()
 
-        # define function callback for tray and hotkey functionality
+        # define function callback for tray context menu functionality
         function_callbacks = (
             lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=False)),
             lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=True))
         )
 
-        # enable hotkeys
-        hotkey = Hotkey(event_queue, *function_callbacks)
-        hotkey.listen()
+        # parse hotkeys from config file
+        HOTKEY_WHOLE = CONFIG.get("hotkeys", "screenshot_whole").split("+")
+        HOTKEY_CROP = CONFIG.get("hotkeys", "screenshot_crop").split("+")
+
+        # enable hotkey functionality
+        hotkey_daemon = Hotkey(event_queue)
+        try:
+            hotkey_daemon.add_hotkey(HOTKEY_WHOLE, lambda: app.take_screenshot(crop=False))
+            hotkey_daemon.add_hotkey(HOTKEY_CROP, lambda: app.take_screenshot(crop=True))
+        except HotkeyInUseError as e:
+            logging.warning(e.error_msg)
+
+        hotkey_daemon.listen()
 
         # create tray
-        tm = Tray(event_queue, *function_callbacks)
-        tm.show()
+        traymenu_daemon = Tray(event_queue, *function_callbacks)
+        traymenu_daemon.show()
 
         while True:
             event = event_queue.get()
