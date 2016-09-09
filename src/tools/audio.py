@@ -1,13 +1,13 @@
 import pyaudio
 import wave
 
-# define the size of data to be read at once from the wave file
-CHUNK = 1024
+# define the amount of data to be read at once from the wave file
+_buffer_size = 1024
 
 
-def play_notification():
+def play_wave_file(path):
     # open the wave file
-    wf = wave.open("res/notification.wav", 'rb')
+    wf = wave.open(path, 'rb')
 
     # instantiate the PyAudio object
     p = pyaudio.PyAudio()
@@ -19,12 +19,12 @@ def play_notification():
                     output=True)
 
     # read data from the wave file
-    data = wf.readframes(CHUNK)
+    data = wf.readframes(_buffer_size)
 
     # write all data from the wave file into the output stream
     while len(data) > 0:
         stream.write(data)
-        data = wf.readframes(CHUNK)
+        data = wf.readframes(_buffer_size)
 
     # clean up
     stream.stop_stream()

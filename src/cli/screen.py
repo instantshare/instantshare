@@ -57,4 +57,4 @@ def main(argv):
     # notify user if set
     if CONFIG.getboolean(CONFIG.general, "notification_sound"):
         import tools.audio as a
-        a.play_notification()
+        a.play_wave_file("res/notification.wav")
