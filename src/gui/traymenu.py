@@ -10,7 +10,7 @@ class Tray(Platform):
         super().__init__()
 
     def init_windows(self):
-        from gui.systrayicon import SysTrayIcon
+        from libraries.systrayicon import SysTrayIcon
 
         # build tray, register callbacks
         menu_options = (

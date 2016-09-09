@@ -1,6 +1,8 @@
 from tkinter import Tk, Canvas
+
 from PIL import ImageTk
-from screenshot.pyrobot import Robot
+
+from libraries.pyrobot import Robot
 
 _r = Robot()
 
