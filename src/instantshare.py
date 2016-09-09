@@ -78,18 +78,22 @@ if __name__ == "__main__":
             lambda: delay_execution(0.3, lambda: app.take_screenshot(crop=True))
         )
 
-        # parse hotkeys from config file
-        HOTKEY_WHOLE = CONFIG.get("hotkeys", "screenshot_whole").split("+")
-        HOTKEY_CROP = CONFIG.get("hotkeys", "screenshot_crop").split("+")
+        # assign callbacks to hotkey options of config file
+        hotkey_options_with_callbacks = {
+            "screenshot_whole": lambda: app.take_screenshot(crop=False),
+            "screenshot_crop": lambda: app.take_screenshot(crop=True)
+        }
+
+        # parse hotkeys from config file and add them to hotkey daemon
+        hotkey_daemon = Hotkey(event_queue)
+        for hotkey_option, callback in hotkey_options_with_callbacks.items():
+            try:
+                hotkey = CONFIG.get("hotkeys", hotkey_option).split("+")
+                hotkey_daemon.add_hotkey(hotkey, callback)
+            except (HotkeyInUseError, InvalidHotkeyError) as e:
+                logging.warning(e.error_msg)
 
         # enable hotkey functionality
-        hotkey_daemon = Hotkey(event_queue)
-        try:
-            hotkey_daemon.add_hotkey(HOTKEY_WHOLE, lambda: app.take_screenshot(crop=False))
-            hotkey_daemon.add_hotkey(HOTKEY_CROP, lambda: app.take_screenshot(crop=True))
-        except (HotkeyInUseError, InvalidHotkeyError) as e:
-            logging.warning(e.error_msg)
-
         hotkey_daemon.listen()
 
         # create tray
