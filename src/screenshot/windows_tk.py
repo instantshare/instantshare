@@ -25,7 +25,7 @@ def take_screenshot_crop(path):
 
     root = Tk()  # Creates a Tkinter window
     root.overrideredirect(True)  # Makes the window borderless
-    root.geometry("{0}x{1}+{2}+{3}".format(width, height, leftmost, topmost))  # Makes the window the same size as the taken screenshot
+    root.geometry("{0}x{1}+{2}+{3}".format(width, height, leftmost, topmost))  # window size = screenshot size
     root.config(cursor="crosshair")  # Sets the cursor to a crosshair
 
     pimage_tk = ImageTk.PhotoImage(pimage)  # Converts the PIL.Image into a Tkinter compatible PhotoImage

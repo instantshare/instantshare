@@ -47,11 +47,12 @@ class OAuthServer(HTTPServer):
         for port in ports:
             try:
                 super().__init__(("", port), OAuthRequestHandler)
-            except:
+            except OSError:
+                # Address already in use, try next
                 continue
             else:
                 break
-        self._access_token = None  # output differs with different OAuth providers
+        self._access_token = None
 
     def wait_for_redirect(self):
         """
@@ -62,7 +63,7 @@ class OAuthServer(HTTPServer):
         return self._access_token
 
 
-def implicit_flow(base_url, client_id, state = None, scope: list = None):
+def implicit_flow(base_url, client_id, state=None, scope: list = None):
     """
     Executes the OAuth2 implicit grant flow for the given base url and client id.
     :param base_url: The base URL of OAuth provider
@@ -78,10 +79,7 @@ def implicit_flow(base_url, client_id, state = None, scope: list = None):
     redirect_uri = "http://localhost:{}/".format(oauth_server.server_port)
 
     # Create URL
-    url = (
-        "{0}?response_type=token&client_id={1}&redirect_uri={2}"
-            .format(base_url, client_id, redirect_uri)
-    )
+    url = "{0}?response_type=token&client_id={1}&redirect_uri={2}".format(base_url, client_id, redirect_uri)
 
     # Add optional GET parameters to URL based on given optional function parameters
     # scope
@@ -93,19 +91,3 @@ def implicit_flow(base_url, client_id, state = None, scope: list = None):
 
     webbrowser.open(url)
     return oauth_server.wait_for_redirect()
-
-""" Test:
-print(implicit_flow(
-    "https://accounts.google.com/o/oauth2/auth",
-    "774886165931-ks0ntcb32p1mhi0nnv8tcmob81e0oetj.apps.googleusercontent.com",
-    None,
-    ["https://www.googleapis.com/auth/drive"]
-))
-"""
-
-""" Test:
-print(implicit_flow(
-    "https://www.dropbox.com/oauth2/authorize",
-    "81glnb2w8xfo0lz"
-))
-"""
