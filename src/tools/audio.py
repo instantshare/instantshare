@@ -4,6 +4,7 @@ import wave
 # define the size of data to be read at once from the wave file
 CHUNK = 1024
 
+
 def play_notification():
     # open the wave file
     wf = wave.open("res/notification.wav", 'rb')

@@ -29,7 +29,7 @@ def upload(file: str):
     transport, sftp_client = _connect()
     try:
         sftp_client.chdir(SFTP_BASE_DIR)
-    except IOError as e:
+    except IOError:
         logging.error(
             "Can not change into base directory. Please provide a working base directory in your SFTP configuration.")
         sys.exit(0)
@@ -42,7 +42,7 @@ def upload(file: str):
     # Upload
     try:
         sftp_client.put(file, sftp_filepath)
-    except IOError as e:
+    except IOError:
         # State reason for failue without exposing Traceback? Is IOError the correct exception?
         # Documentation: http://docs.paramiko.org/en/2.0/api/sftp.html
         logging.error("Upload failed.")
