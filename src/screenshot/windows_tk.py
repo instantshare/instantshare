@@ -1,5 +1,4 @@
 from tkinter import Tk, Canvas
-
 from PIL import ImageTk
 
 from libraries.pyrobot import Robot
@@ -50,6 +49,11 @@ def take_screenshot_crop(path):
         can.delete(CanInfo.rect)
         CanInfo.rect = can.create_rectangle(CanInfo.startx, CanInfo.starty, event.x, event.y)
 
+    # Cancels screen capture
+    def cancel(event):
+        if event.keycode == 27:  # cancel when pressing ESC
+            root.destroy()
+
     # Saves the image when the user releases the left mouse button
     def save_img(event):
         startx, starty = CanInfo.startx, CanInfo.starty
@@ -66,8 +70,10 @@ def take_screenshot_crop(path):
         root.destroy()  # Closes the Tkinter window
 
     # Binds mouse actions to the functions defined above
+    can.bind("<KeyPress>", cancel)
     can.bind("<Button-1>", xy)
     can.bind("<B1-Motion>", capture_motion)
     can.bind("<ButtonRelease-1>", save_img)
 
+    can.focus_force() # Force focus of capture screen
     root.mainloop()  # Shows the Tk window and loops until it is closed

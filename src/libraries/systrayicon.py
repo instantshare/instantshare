@@ -10,7 +10,9 @@
 #              win32gui_taskbar.py and win32gui_menu.py demos from PyWin32
 
 import os
+import sys
 import win32api
+
 import win32con
 import win32gui_struct
 
@@ -31,6 +33,7 @@ class SysTrayIcon(object):
                  icon,
                  hover_text,
                  menu_options,
+                 event_queue,
                  on_quit=None,
                  default_menu_index=None,
                  window_class_name=None, ):
@@ -38,6 +41,7 @@ class SysTrayIcon(object):
         self.icon = icon
         self.hover_text = hover_text
         self.on_quit = on_quit
+        self.event_queue = event_queue
 
         menu_options = menu_options + (('Quit', None, self.QUIT),)
         self._next_action_id = self.FIRST_ID
@@ -208,9 +212,9 @@ class SysTrayIcon(object):
     def execute_menu_option(self, id):
         menu_action = self.menu_actions_by_id[id]
         if menu_action == self.QUIT:
-            win32gui.DestroyWindow(self.hwnd)
+            self.event_queue.put(lambda: sys.exit(0))
         else:
-            menu_action(self)
+            self.event_queue.put(menu_action(self))
 
 
 def non_string_iterable(obj):

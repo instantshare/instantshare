@@ -9,6 +9,8 @@ Options:
   --tool=<tool>         Overwrite the screenshot_tool config parameter
   --storage=<provider>  Overwrite the storage config parameter
 """
+import os
+
 from docopt import docopt
 from tools.config import CONFIG
 from importlib import import_module
@@ -34,6 +36,11 @@ def main(argv):
         scrtool.take_screenshot_whole(file)
     else:
         scrtool.take_screenshot_crop(file)
+
+    if not os.path.isfile(file):
+        # Capture screen cancelled
+        logging.debug("Screen capture cancelled.")
+        return
 
     # upload to storage
     url = storage.upload(file)

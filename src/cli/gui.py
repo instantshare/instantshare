@@ -11,16 +11,23 @@ Usage:  instantshare gui [options]
 Options:
   -h, --help  Display this information
 """
-from docopt import docopt
-from cli.main import execute_command
-
 import logging
+from queue import Queue
+
+from docopt import docopt
+
+from cli.main import execute_command
+from gui.traymenu import Tray
+from tools.config import CONFIG
+from tools.hotkey import Hotkey, HotkeyInUseError, InvalidHotkeyError
+from tools.toolbox import delay_execution
 
 
 def main(argv):
     args = docopt(__doc__, argv)
-    from gui.traymenu import Tray
-    from tools.toolbox import delay_execution
+
+    # Event Queue for main thread
+    event_queue = Queue()
 
     # define callbacks for menu items in system tray context menu
     tray_callbacks = (
@@ -28,7 +35,29 @@ def main(argv):
         lambda: delay_execution(0.3, lambda: execute_command("screen"))
     )
 
+    # assign callbacks to hotkey options of config file
+    hotkey_options_with_callbacks = {
+        "screenshot_whole": lambda: execute_command("screen --whole"),
+        "screenshot_crop": lambda: execute_command("screen")
+    }
+
+    # parse hotkeys from config file and add them to hotkey daemon
+    hotkey_daemon = Hotkey(event_queue)
+    for hotkey_option, callback in hotkey_options_with_callbacks.items():
+        try:
+            hotkey = CONFIG.get("hotkeys", hotkey_option).split("+")
+            hotkey_daemon.add_hotkey(hotkey, callback)
+        except (HotkeyInUseError, InvalidHotkeyError) as e:
+            logging.warning(e.error_msg)
+
+    # enable hotkey functionality
+    hotkey_daemon.listen()
+
     # create tray
     logging.info("Creating tray icon for instantshare")
-    tm = Tray(*tray_callbacks)
-    tm.show()
+    traymenu_daemon = Tray(event_queue, *tray_callbacks)
+    traymenu_daemon.show()
+
+    while True:
+        event = event_queue.get()
+        event()
