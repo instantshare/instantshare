@@ -11,20 +11,20 @@ Usage:  instantshare gui [options]
 Options:
   -h, --help  Display this information
 """
-from docopt import docopt
-from cli.main import execute_command
-
 import logging
+from queue import Queue
 
+from docopt import docopt
+
+from cli.main import execute_command
+from gui.traymenu import Tray
 from tools.config import CONFIG
+from tools.hotkey import Hotkey, HotkeyInUseError, InvalidHotkeyError
+from tools.toolbox import delay_execution
 
 
 def main(argv):
     args = docopt(__doc__, argv)
-    from gui.traymenu import Tray
-    from tools.hotkey import Hotkey, HotkeyInUseError, InvalidHotkeyError
-    from tools.toolbox import delay_execution
-    from queue import Queue
 
     # Event Queue for main thread
     event_queue = Queue()
