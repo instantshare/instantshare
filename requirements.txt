@@ -1,4 +1,5 @@
 docopt
+opuslib
 paramiko>=2.0.0
 cryptography
 dropbox
