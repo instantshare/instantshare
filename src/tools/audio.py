@@ -39,11 +39,10 @@ class WaveRecorder:
     Class for recording a wave audio file. Preferably used in a 'with' statement,
     other than that: make sure to call close() afterwards!
 
-    Credit to:
-    mabdrabo - https://gist.github.com/mabdrabo/8678538
+    Credit to mabdrabo - https://gist.github.com/mabdrabo/8678538
     """
 
-    def __init__(self, ):
+    def __init__(self):
         # sound settings for recording and encoding
         self.audio_format = pyaudio.paInt16
         self.rate = 16000
@@ -120,12 +119,3 @@ class WaveRecorder:
         Close audio stream.
         """
         self.input_stream.close()
-
-
-# for testing
-if __name__ == "__main__":
-    with WaveRecorder() as rec:
-        rec.start_record()
-        input()
-        rec.stop_record()
-        rec.save("test.wav")
