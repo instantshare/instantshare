@@ -1,10 +1,7 @@
 import pyaudio
 import wave
 import threading
-import time
 
-from opuslib import Encoder
-from opuslib import constants as opusconst
 
 # define the amount of data to be read at once from the wave file
 _wave_buffer_size = 1024
@@ -37,24 +34,21 @@ def play_wave_file(path):
     p.terminate()
 
 
-class OpusRecorder:
+class WaveRecorder:
     """
-    Class for recording to an opus file. Preferably used in a 'with' statement,
+    Class for recording a wave audio file. Preferably used in a 'with' statement,
     other than that: make sure to call close() afterwards!
 
     Credit to:
-    3demax   - https://gist.github.com/3demax/4653037
     mabdrabo - https://gist.github.com/mabdrabo/8678538
     """
 
-    def __init__(self):
+    def __init__(self, ):
         # sound settings for recording and encoding
         self.audio_format = pyaudio.paInt16
-        self.rate = 8000
-        self.chunk = 50
+        self.rate = 16000
+        self.chunk = 1024
         self.channels = 2
-        self.frame_size = 160
-        self.seconds_in_frame = 0.02
 
         # open pyaudio input stream to record. Uses default sound device.
         self.audio = pyaudio.PyAudio()
@@ -111,17 +105,15 @@ class OpusRecorder:
 
     def save(self, path):
         """
-        Encode the audio data using opus codec and save to file.
+        Encode the audio data using wave codec and save to file.
         :param path: path of the file
         """
-        enc = Encoder(self.rate, self.channels, opusconst.APPLICATION_TYPES_MAP['voip'])
-        # TODO: how to encode properly? 3demax's solution seems to raise a TypeError.
-        opusdata = enc.encode(b''.join(self.audio_data), self.frame_size)
-
-        # write encoded data to file
-        # TODO: opusdata is only a few bytes?
-        with open(path, "wb") as file:
-            file.write(opusdata)
+        file = wave.open(path, "wb")
+        file.setnchannels(self.channels)
+        file.setsampwidth(self.audio.get_sample_size(self.audio_format))
+        file.setframerate(self.rate)
+        file.writeframes(b''.join(self.audio_data))
+        file.close()
 
     def close(self):
         """
@@ -132,8 +124,8 @@ class OpusRecorder:
 
 # for testing
 if __name__ == "__main__":
-    with OpusRecorder() as rec:
+    with WaveRecorder() as rec:
         rec.start_record()
-        time.sleep(3)
+        input()
         rec.stop_record()
-        rec.save("test.opus")
+        rec.save("test.wav")
