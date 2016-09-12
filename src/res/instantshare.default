@@ -1,5 +1,17 @@
 [General]
 
+# How (or if at all) to encrypt data that is used to access your storage provider.
+# This includes:
+#   - access tokens (allow usage the service in question in your name)
+#   - credentials (username and password)
+#   - passphrases for key files
+#
+# Possible values:
+#   - None (or leave it empty): No encryption will be used
+#   - password: you will be asked to enter a password everytime you use instantshare
+#   - keyring: create a password and store it in the system keyring
+encryption =
+
 # The hoster you want to upload your screenshots to.
 # Possible Values: imgur, dropbox, googledrive, sftp
 storage = imgur
