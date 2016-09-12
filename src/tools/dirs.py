@@ -16,3 +16,10 @@ configs = _mk(appdirs.user_config_dir())
 cache = _mk(appdirs.user_cache_dir())
 data = _mk(appdirs.user_cache_dir())
 res = str(os.path.dirname(resources.__file__))
+
+
+if __name__ == "__main__":
+    print("Log dir:      " + logs)
+    print("Config dir:   " + configs)
+    print("Cache dir:    " + cache)
+    print("Userdata dir: " + data)
