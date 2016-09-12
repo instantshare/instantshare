@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from tools import dirs
 import logging
 from os import path
 
@@ -16,8 +17,8 @@ class Config(ConfigParser):
         3. Only call write if you made configuration changes and want to save them
     """
     general = "General"
-    _file = "instantshare.conf"
-    _default = "res/instantshare.default"
+    _file = dirs.configs + "/instantshare.conf"
+    _default = dirs.res + "/instantshare.default"
 
     def __init__(self):
         super().__init__()

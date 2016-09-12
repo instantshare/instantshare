@@ -1,19 +1,17 @@
 import logging
 import pickle
-import os
 
 import tools.encryption as crypt
+from tools import dirs
 
 
-persistent_data_dir = "data/"
+persistent_data_dir = dirs.data
 
 
 class KVStore(dict):
 
     def __init__(self, module_name="general", pw=None):
         super().__init__()
-        # TODO: this is user data - put this where it belongs
-        os.makedirs(persistent_data_dir, exist_ok=True)
         self._filepath = persistent_data_dir + module_name
         self._encrypted = pw is not None
 

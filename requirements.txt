@@ -7,3 +7,4 @@ imgurpython
 pillow
 pyaudio
 pyhooked
+appdirs

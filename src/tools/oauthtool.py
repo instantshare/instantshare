@@ -1,6 +1,7 @@
 import threading
 import webbrowser
 from http.server import CGIHTTPRequestHandler, HTTPServer
+from tools import dirs
 
 
 class OAuthRequestHandler(CGIHTTPRequestHandler):
@@ -9,7 +10,7 @@ class OAuthRequestHandler(CGIHTTPRequestHandler):
         p = str(self.path)
         if p == "/":
             # write out js which filters the hash part of the url and redirects to /auth
-            self.write_out("res/redirect.html")
+            self.write_out(dirs.res + "/redirect.html")
         elif p.startswith("/auth?"):
             # parse return parameters
             pstrings = p[6:].split("&")
@@ -21,7 +22,7 @@ class OAuthRequestHandler(CGIHTTPRequestHandler):
             self.server._access_token = pdict
 
             # write out success page
-            self.write_out("res/completed.html")
+            self.write_out(dirs.res + "/completed.html")
             # kill the server from a seperate thread
             killer = threading.Thread(target=self.server.shutdown)
             killer.daemon = True
