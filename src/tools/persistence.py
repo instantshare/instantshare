@@ -8,66 +8,61 @@ import tools.encryption as crypt
 persistent_data_dir = "data/"
 
 
+class PersistentDataEncryptedError(BaseException):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 class KVStore(dict):
 
-    def __init__(self, module_name="general", pw=None):
+    def __init__(self, module_name=".general", pw=None, unlock=False):
+
+        if unlock and not pw:
+            raise ValueError("you have to supply a password to unlock the stored data")
+
         super().__init__()
+
         # TODO: this is user data - put this where it belongs
         os.makedirs(persistent_data_dir, exist_ok=True)
         self._filepath = persistent_data_dir + module_name
-        self._encrypted = pw is not None
-
-        if self._encrypted:
-            self._key = crypt.SymmetricKey(pw)
+        self._encrypt_on_write = pw is not None and unlock is False
+        self._key = crypt.SymmetricKey(pw) if pw else None
 
         # try to load persistent data
-        data = {}
-        dirty = False
-
-        # data read by pickle has to be a dict, just to make sure
-        def validate(x):
-            if not isinstance(x, dict):
-                raise TypeError("The data read from disk has to be a dict.")
-            return x
-
         try:
             with open(self._filepath, mode="rb") as file:
                 binary_data = file.read()
+        except IOError:
+            # there was no usable data, which is okay
+            return
 
-            if self._encrypted:
-                try:
-                    # decrypt binary data and deserialize
-                    data = validate(pickle.loads(self._key.decrypt(binary_data)))
-                except crypt.CryptoError:
-                    # data was not encrypted yet
-                    data = pickle.loads(binary_data)
-                    dirty = True
-            else:
-                # deserialize binary data
-                try:
-                    data = pickle.loads(binary_data)
-                except:
-                    # except is intentionally broad: pickle throws a variety of exceptions.
-                    # Data was probably encrypted, if not, we will catch the error later again.
-                    # TODO ask user for password instead of overwriting data
-                    logging.error("Trying to load encrypted data without decryption key.")
-                    dirty = True
-        except:
-            # except is intentionally broad:
-            # If anything happens, we can only overwrite the old data.
-            # There is no data yet, or the data has been corrupted.
-            pass
-        else:
-            self.update(data)
-            if dirty:
+        # there is data, load into dict
+        if pw:
+            try:
+                # decrypt, deserialize, update self
+                self.update(pickle.loads(self._key.decrypt(binary_data)))
+                # sync if the data is to be unlocked
+                if unlock:
+                    self.sync()
+            except crypt.CryptoError:
+                # data was not encrypted yet, load and sync back
+                self.update(pickle.loads(binary_data))
                 self.sync()
+        else:
+            try:
+                # deserialize, update self
+                self.update(pickle.loads(binary_data))
+            except:
+                # intentionally broad: pickle throws a variety of exceptions.
+                # data was probably encrypted, let caller handle this
+                raise PersistentDataEncryptedError
 
     def sync(self):
         data = {}
         data.update(self)
         bdata = pickle.dumps(data)
         with open(self._filepath, mode="wb") as file:
-            if self._encrypted:
+            if self._encrypt_on_write:
                 file.write(self._key.encrypt(bdata))
             else:
                 file.write(bdata)
