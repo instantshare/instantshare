@@ -16,6 +16,27 @@ class PersistentDataEncryptedError(BaseException):
 class KVStore(dict):
 
     def __init__(self, module_name=".general", pw=None, unlock=False):
+        """
+        Initialize a KVStore instance.
+
+        :param module_name:
+        Determines which dictionary to use. Will look for a file with that name.
+
+        :param pw:
+        Password for decrypting or encrypting the persistent data
+
+        :param unlock:
+        If True, will encrypt persistent data using pw, but write back unencrypted
+
+        :raises ValueError:
+        When unlock is set to True, but no password is supplied.
+
+        :raises crypt.CryptoError:
+        When the supplied password is wrong.
+
+        :raises PersistentDataEncryptedError:
+        When encryption was turned off by the user since the last run and the data is still encrypted.
+        """
 
         if unlock and not pw:
             raise ValueError("you have to supply a password to unlock the stored data")
@@ -45,8 +66,12 @@ class KVStore(dict):
                 if unlock:
                     self.sync()
             except crypt.CryptoError:
-                # data was not encrypted yet, load and sync back
-                self.update(pickle.loads(binary_data))
+                # load and sync back if clear
+                # raise crypt.CryptoError again when password was wrong
+                try:
+                    self.update(pickle.loads(binary_data))
+                except:
+                    raise crypt.CryptoError
                 self.sync()
         else:
             try:
