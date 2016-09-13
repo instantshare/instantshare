@@ -91,3 +91,14 @@ class KVStore(dict):
                 file.write(self._key.encrypt(bdata))
             else:
                 file.write(bdata)
+
+
+class KVStub(KVStore):
+
+    def __init__(self, *args, **kwargs):
+        # don't actually do anything
+        pass
+
+    def __getattr__(self, item):
+        # overwrite any calls to this object
+        raise NotImplementedError
