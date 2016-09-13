@@ -6,4 +6,3 @@ google-api-python-client
 imgurpython
 pillow
 pyaudio
-pyhooked
