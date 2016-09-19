@@ -1,4 +1,3 @@
-import logging
 import pickle
 import os
 
@@ -14,28 +13,42 @@ class PersistentDataEncryptedError(BaseException):
 
 
 class KVStore(dict):
+    """
+    An extended dictionary that is similar to Python's "shelve", but optionally
+    supports encryption. Also supports transitions between encrypted and
+    unencrypted modes.
+    """
 
     def __init__(self, module_name=".general", pw=None, unlock=False):
         """
-        Initialize a KVStore instance.
+        Initialize a KVStore instance. Supply a password to encrypt the data
+        on disk. If you set unlock to True, you can decrypt previously
+        encrypted data.
 
         :param module_name:
-        Determines which dictionary to use. Will look for a file with that name.
+        Determines which dictionary to use. Will look for a file with that name
+        in the persistent data directory.
 
         :param pw:
-        Password for decrypting or encrypting the persistent data
+        Password for decrypting or encrypting the persistent data. If None,
+        will not encrypt the data on disk. Has to be specified for decryption
+        when unlock == True.
 
         :param unlock:
-        If True, will encrypt persistent data using pw, but write back unencrypted
+        If True, will decrypt existing persistent data using specified pw and
+        write unencrypted data back to disk immediately.
 
         :raises ValueError:
-        When unlock is set to True, but no password is supplied.
+        When unlock is set to True, but no password is supplied. The password
+        is needed for decryption.
 
         :raises crypt.CryptoError:
         When the supplied password is wrong.
 
         :raises PersistentDataEncryptedError:
-        When encryption was turned off by the user since the last run and the data is still encrypted.
+        When encryption was turned off by the user since the last run and the
+        data is still encrypted. In this case, you should specify a pw and set
+        unlock to True. This will decrypt the data on disk.
         """
 
         if unlock and not pw:
