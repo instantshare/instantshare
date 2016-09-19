@@ -214,7 +214,7 @@ class SysTrayIcon(object):
         if menu_action == self.QUIT:
             self.event_queue.put(lambda: sys.exit(0))
         else:
-            self.event_queue.put(menu_action(self))
+            self.event_queue.put(lambda: menu_action(self))
 
 
 def non_string_iterable(obj):
