@@ -19,8 +19,8 @@ Options:
 """
 from docopt import docopt, printable_usage
 from importlib import import_module
+from tools import dirs
 
-import os
 import sys
 import shlex
 import logging
@@ -29,9 +29,10 @@ import logging
 __commands__ = ["screen", "text", "video", "audio", "file", "gui"]
 
 
-def _setup_logging(level=logging.INFO, filename=None):
+def _setup_logging(level=logging.INFO, file=False):
     fmtstr = "%(asctime)s\t%(levelname)s:\t%(message)s"
-    if filename:
+    if file:
+        filename = dirs.logs + "/logfile.log"
         logging.basicConfig(filename=filename, level=level, format=fmtstr)
     else:
         logging.basicConfig(level=level, format=fmtstr)
@@ -57,11 +58,7 @@ def execute_command(cmd: str):
 
 
 def main():
-    # TODO: Issue #20
-    project_home = os.path.dirname(os.path.abspath(__file__)) + "/.."
-    os.chdir(project_home)
-
-    _setup_logging()
+    _setup_logging(file=False)
 
     # TODO access centralized version information
     args = docopt(__doc__, options_first=True, version="instantshare version 0.1")
