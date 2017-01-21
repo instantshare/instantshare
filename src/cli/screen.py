@@ -12,6 +12,8 @@ Options:
 import os
 
 from docopt import docopt
+
+from tools import dirs
 from tools.config import CONFIG
 from importlib import import_module
 from tempfile import gettempdir
@@ -57,4 +59,4 @@ def main(argv):
     # notify user if set
     if CONFIG.getboolean(CONFIG.general, "notification_sound"):
         import tools.audio as a
-        a.play_wave_file("res/notification.wav")
+        a.play_wave_file(dirs.res + "/notification.wav")
