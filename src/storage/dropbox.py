@@ -1,44 +1,76 @@
-from tools.config import CONFIG
-import dropbox
-import ntpath
-import webbrowser
 import logging
+import ntpath
+
+import dropbox
+from dropbox.files import WriteMode
+
+from tools.config import CONFIG
+from tools.oauthtool import implicit_flow
+from tools.persistence import KVStore
 
 _name = "dropbox"
+# TODO: encryption
+kvstore = KVStore(_name)
 
 
 def upload(file: str) -> str:
-    # TODO: Add routine for safely stored app_key and app_secret
-    app_key = CONFIG.get(_name, "app_key")
-    app_secret = CONFIG.get(_name, "app_secret")
-
     # TODO: Use another way to find out if the access token is valid
-    if CONFIG.get(_name, "access_token") == "0":
-        flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
-        authorize_url = flow.start()
+    # FIXME: Check for authorization failure
+    if "access_token" not in kvstore.keys():
+        authorization_successful = _authorize()
+        if not authorization_successful:
+            return None  # unable to upload without successful authorization
 
-        webbrowser.open_new_tab(authorize_url)
-        code = input("Enter the authorization code here: ").strip()
-
-        access_token, user_id = flow.finish(code)
-
-        CONFIG.set(_name, "access_token", access_token)
-        CONFIG.set(_name, "user_id", user_id)
-        CONFIG.write()
-
-    access_token = CONFIG.get(_name, "access_token")
-    user_id = CONFIG.get(_name, "user_id")
-
-    f = open(file, 'rb')
-    # According to DropboxClient, this documentation is deprecated:
-    # https://www.dropbox.com/developers-v1/core/start/python
-    dropbox_client = dropbox.client.DropboxClient(access_token)
-    dropbox_filepath = CONFIG.get(CONFIG.general, "screenshot_dir") + "/" + ntpath.basename(file)
+    token = kvstore["access_token"]
+    dropbox_client = dropbox.Dropbox(token)
+    dropbox_filepath = "/" + CONFIG.get(CONFIG.general, "screenshot_dir") + "/" + ntpath.basename(file)
+    file_object = open(file, 'rb')
 
     try:
-        response = dropbox_client.put_file(dropbox_filepath, f)
-    except dropbox.rest.ErrorResponse as e:
-        logging.error(e.error_msg)
+        dropbox_client.files_upload(
+            file_object,
+            dropbox_filepath,
+            mode=WriteMode("overwrite", None),
+            client_modified=None,
+            mute=False
+        )
+    except dropbox.exceptions.ApiError as e:
+        logging.error("Upload failed. Error message: {0}".format(e.error_msg))
+        return None
 
-    url = dropbox_client.media(dropbox_filepath)["url"]
+    try:
+        url = dropbox_client.sharing_create_shared_link_with_settings(dropbox_filepath, None).url
+    except dropbox.exceptions.ApiError as e:
+        logging.error("Could not create shared link. Error message: {0}".format(e.error_msg))
+        return None
+
+    return _change_url_suffix(url)
+
+
+def _authorize():
+    authorization_endpoint = "https://www.dropbox.com/oauth2/authorize"
+    app_key = CONFIG.get(_name, "app_key")
+
+    # Start OAuth2 implicit flow
+    auth_response = implicit_flow(authorization_endpoint, app_key)
+
+    # Check if authorization was successful
+    if "error" in auth_response and auth_response["error"] is not None:
+        logging.error("Authentication failed. Error message: {0}".format(auth_response["error_description"]))
+        return False
+
+    kvstore["access_token"] = auth_response["access_token"]
+    kvstore.sync()
+
+    return True
+
+
+def _change_url_suffix(url):
+    # Modifies URL that it directly refers to the uploaded file.
+    suffix = "dl=0"
+    raw_suffix = "raw=1"
+
+    if url.endswith(suffix):
+        url = url.replace(suffix, raw_suffix)
+
     return url

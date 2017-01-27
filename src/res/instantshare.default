@@ -1,8 +1,28 @@
 [General]
-storage = googledrive
-audio_dir = audio
+
+# The hoster you want to upload your screenshots to.
+# Possible Values: imgur, dropbox, googledrive, sftp, owncloud
+storage = imgur
+
+# The base directory name for screenshots when using hosters like dropbox
 screenshot_dir = Screenshots
+
+# The screenshot tool to use. The name corresponds to the name of the python modules in the screenshot package.
+# Possible Values: windows_tk (Windows only), gnome_screenshot (Linux only)
+screenshot_tool = $SCREENSHOT_TOOL
+
+# Whether or not to automatically copy the public URL to the uploaded medium to the clipboard.
+# When not copied to the clipboard, the URL will be opened in the web browser.
+# Possible Values: True, False
 cb_autocopy = True
+
+# Whether or not to play the notification sound when the upload is done.
+# Possible Values: True, False
+notification_sound = True
+
+[hotkeys]
+screenshot_crop = Lcontrol+Lshift+2
+screenshot_whole = Lcontrol+Lshift+3
 
 [dropbox]
 app_key = 81glnb2w8xfo0lz
@@ -22,7 +42,17 @@ username = 0
 password = 0
 
 [sftp]
-username = 0
-password = 0
 hostname = example.com
+# Base directory for files (. is home directory of user)
+base_dir = .
 port = 22
+username = 0
+authentication_type = password OR key
+# Authentication type password
+password = 0
+# Authentication type key
+key_passphrase = 0
+key_filepath = 0
+
+[imgur]
+client_id = a5e814c239e21f0

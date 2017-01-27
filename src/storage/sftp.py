@@ -1,36 +1,93 @@
 import logging
 import ntpath
 import sys
+
 import paramiko
+
 from tools.config import CONFIG
+from tools.persistence import KVStore
 
 _name = "sftp"
+# TODO: encryption
+kvstore = KVStore(_name)
+
+# Load SFTP server info from config file
+HOSTNAME = CONFIG.get(_name, "hostname")
+PORT = CONFIG.getint(_name, "port")
+USERNAME = CONFIG.get(_name, "username")
+AUTHENTICATION_TYPE = CONFIG.get(_name, "authentication_type")
+SFTP_BASE_DIR = CONFIG.get(_name, "base_dir")
+
+
+# The provided user for SFTP upload must have read and write permissions in the SFTP_BASE_DIR
+# (The SFTP_BASE_DIR has to exist, the user doesn't need permissions in the parent directory).
+# A lack of permissions in SFTP_BASE_DIR will break the SFTP upload functionality.
 
 
 def upload(file: str):
-    username = CONFIG.get(_name, "username")
-    password = CONFIG.get(_name, "password")
-    hostname = CONFIG.get(_name, "hostname")
-    port = CONFIG.getint(_name, "port")
+    # Upload preparations
+    transport, sftp_client = _connect()
     try:
-        transport = paramiko.Transport((hostname, port))
+        sftp_client.chdir(SFTP_BASE_DIR)
+    except IOError:
+        logging.error(
+            "Can not change into base directory. Please provide a working base directory in your SFTP configuration.")
+        sys.exit(0)
+
+    screenshot_dir = CONFIG.get(CONFIG.general, "screenshot_dir")
+    sftp_filepath = screenshot_dir + "/" + ntpath.basename(file)
+
+    _create_dir_if_not_exists(screenshot_dir, sftp_client)
+
+    # Upload
+    try:
+        sftp_client.put(file, sftp_filepath)
+    except IOError:
+        # State reason for failue without exposing Traceback? Is IOError the correct exception?
+        # Documentation: http://docs.paramiko.org/en/2.0/api/sftp.html
+        logging.error("Upload failed.")
+
+    # Close
+    sftp_client.close()
+    transport.close()
+
+    return "http://" + HOSTNAME + "/" + sftp_filepath
+
+
+def _create_dir_if_not_exists(directory_name, sftp_client):
+    dirs = sftp_client.listdir()
+    if directory_name not in dirs:
+        sftp_client.mkdir(directory_name)
+        logging.info("Directory '{0}' did not exist and was created.".format(directory_name))
+
+
+def _connect():
+    # Create transport object
+    try:
+        transport = paramiko.Transport((HOSTNAME, PORT))
     except paramiko.ssh_exception.SSHException:
         logging.error("Connection to the host failed. Check hostname and port.")
         sys.exit(0)
-    try:
-        transport.connect(username=username, password=password)
-    except paramiko.ssh_exception.AuthenticationException:
-        logging.error("Login failed. Check username and password.")
-        sys.exit(0)
-    sftp = paramiko.SFTPClient.from_transport(transport)
-    screenshot_dir = CONFIG.get(CONFIG.general, "screenshot_dir")
-    web_path = screenshot_dir + "/" + ntpath.basename(file)
-    dirs = sftp.listdir()
-    if screenshot_dir not in dirs:
-        sftp.mkdir(screenshot_dir)
-        logging.info("Screenshot directory did not exist and was created.")
 
-    sftp.put(file, web_path)
-    sftp.close()
-    transport.close()
-    return hostname + "/" + web_path
+    # Start SSH session based on authentication type
+    try:
+        if AUTHENTICATION_TYPE == "password":
+            # FIXME: Use encrypted KVStore for password
+            password = CONFIG.get(_name, "password")
+            transport.connect(username=USERNAME, password=password)
+
+        elif AUTHENTICATION_TYPE == "key":
+            # FIXME: Use encrypted KVStore for password
+            key_filepath = CONFIG.get(_name, "key_filepath")
+            key_passphrase = CONFIG.get(_name, "key_passphrase")
+            private_key = paramiko.RSAKey.from_private_key_file(key_filepath, key_passphrase)
+            transport.connect(username=USERNAME, pkey=private_key)
+
+        else:
+            logging.error("Unknown authentication type.")
+
+    except paramiko.ssh_exception.AuthenticationException:
+        logging.error("Login failed. Check username and password or private key and passphrase.")
+        sys.exit(0)
+
+    return transport, paramiko.SFTPClient.from_transport(transport)

@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from tools import dirs
 import logging
 from os import path
 
@@ -16,17 +17,36 @@ class Config(ConfigParser):
         3. Only call write if you made configuration changes and want to save them
     """
     general = "General"
-    _file = "instantshare.conf"
-    _default = "res/instantshare.default"
+    _file = dirs.configs + "/instantshare.conf"
+    _default = dirs.res + "/instantshare.default"
 
     def __init__(self):
         super().__init__()
         self.read()
 
+    def __dynamic_defaults(self):
+        """
+        Used to get all elements for the default configuration that can only
+        be determined at runtime, for example platform-specific options.
+        :return: Dictionary with config variables to replace.
+        """
+        from sys import platform
+        if platform == "linux":
+            return {"$SCREENSHOT_TOOL": "gnome_screenshot"}
+        elif platform == "win32":
+            return {"$SCREENSHOT_TOOL": "windows_tk"}
+
     def __default_config(self):
-        # sane default configuration
+        """
+        Creates a new instantshare.conf file from res/instantshare.default,
+        replacing all config variables like $SCREENSHOT_TOOL.
+        """
         with open(Config._default) as _in, open(Config._file, "w") as _out:
-            _out.write(_in.read())
+            content = _in.read()
+            replace = self.__dynamic_defaults()
+            for key in replace.keys():
+                content = content.replace(key, replace[key])
+            _out.write(content)
         self.read()
 
     def read(self):

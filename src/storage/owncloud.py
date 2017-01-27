@@ -26,6 +26,5 @@ def upload(file: str) -> str:
 
     # upload file
     oc.put_file(remotefile, file)
-    link = oc.share_file_with_link(remotefile)
+    return str(oc.share_file_with_link(remotefile).get_link())
 
-    return link

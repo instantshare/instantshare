@@ -1,5 +1,10 @@
+docopt
 paramiko>=2.0.0
+cryptography
 dropbox
 google-api-python-client
+imgurpython
 pillow
-pyocclient>=0.3
+pyaudio
+appdirs
+pyocclient==0.4
