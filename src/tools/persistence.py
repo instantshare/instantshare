@@ -1,9 +1,9 @@
 import logging
+import os
 import pickle
 
 import tools.encryption as crypt
 from tools import dirs
-
 
 persistent_data_dir = dirs.data
 
@@ -12,7 +12,7 @@ class KVStore(dict):
 
     def __init__(self, module_name="general", pw=None):
         super().__init__()
-        self._filepath = persistent_data_dir + module_name
+        self._filepath = os.path.join(persistent_data_dir, module_name)
         self._encrypted = pw is not None
 
         if self._encrypted:
