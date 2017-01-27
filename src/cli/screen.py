@@ -15,6 +15,8 @@ import keyring
 import getpass
 
 from docopt import docopt
+
+from tools import dirs
 from tools.config import CONFIG
 from tools.encryption import CryptoError
 from tools.persistence import KVStore, PersistentDataEncryptedError
@@ -103,4 +105,4 @@ def main(argv):
     # notify user if set
     if CONFIG.getboolean(CONFIG.general, "notification_sound"):
         import tools.audio as a
-        a.play_wave_file("res/notification.wav")
+        a.play_wave_file(dirs.res + "/notification.wav")

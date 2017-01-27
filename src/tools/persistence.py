@@ -1,10 +1,11 @@
-import pickle
+import logging
 import os
+import pickle
 
 import tools.encryption as crypt
+from tools import dirs
 
-
-persistent_data_dir = "data/"
+persistent_data_dir = dirs.data
 
 
 class PersistentDataEncryptedError(BaseException):
@@ -55,10 +56,7 @@ class KVStore(dict):
             raise ValueError("you have to supply a password to unlock the stored data")
 
         super().__init__()
-
-        # TODO: this is user data - put this where it belongs
-        os.makedirs(persistent_data_dir, exist_ok=True)
-        self._filepath = persistent_data_dir + module_name
+        self._filepath = os.path.join(persistent_data_dir, module_name)
         self._encrypt_on_write = pw is not None and unlock is False
         self._key = crypt.SymmetricKey(pw) if pw else None
 

@@ -2,9 +2,9 @@ keyring
 docopt
 paramiko>=2.0.0
 cryptography
-dropbox
+dropbox==7.1.1
 google-api-python-client
 imgurpython
 pillow
 pyaudio
-pyhooked
+appdirs

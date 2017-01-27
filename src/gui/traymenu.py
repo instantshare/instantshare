@@ -1,6 +1,7 @@
 import threading
 
 from tools.toolbox import Platform
+from tools import dirs
 
 
 class Tray(Platform):
@@ -22,7 +23,7 @@ class Tray(Platform):
 
         def show():
             thread = threading.Thread(
-                target=lambda: SysTrayIcon("res/instantshare.ico", "InstantShare", menu_options, self.event_queue),
+                target=lambda: SysTrayIcon(dirs.res + "/instantshare.ico", "InstantShare", menu_options, self.event_queue),
                 daemon=True)
             thread.start()
 

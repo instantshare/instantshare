@@ -27,13 +27,14 @@ def upload(file: str) -> str:
 
     try:
         dropbox_client.files_upload(
-            file_object,
+            file_object.read(),
             dropbox_filepath,
             mode=WriteMode("overwrite", None),
             client_modified=None,
             mute=False
         )
     except dropbox.exceptions.ApiError as e:
+        # FIXME: 'ApiError' object has no attribute 'error_msg'
         logging.error("Upload failed. Error message: {0}".format(e.error_msg))
         return None
 
