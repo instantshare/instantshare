@@ -1,20 +1,20 @@
 import owncloud
-from tools.config import CONFIG
 import ntpath
+import logging
+
+from tools.persistence import KVStub
+from tools.config import CONFIG
 
 _name = "owncloud"
+kvstore = KVStub()
 
 
 def upload(file: str) -> str:
     owncloud_url = CONFIG.get(_name, "url")
-
-    # TODO: prompt user for password using QT dialog
-    user = CONFIG.get(_name, "username")
-    pw = CONFIG.get(_name, "password")
-
-    assert owncloud_url and user and pw
     oc = owncloud.Client(owncloud_url)
-    oc.login(user, pw)
+
+    if not _login(oc):
+        return
 
     # find or create screenshot directory
     dir = CONFIG.get(CONFIG.general, "screenshot_dir")
@@ -27,4 +27,43 @@ def upload(file: str) -> str:
     # upload file
     oc.put_file(remotefile, file)
     return str(oc.share_file_with_link(remotefile).get_link())
+
+
+def _login(oc: owncloud.Client):
+    kvstore_dirty = False
+
+    # initial case: no username or password present
+    if "username" not in kvstore.keys() or "password" not in kvstore.keys():
+        kvstore["username"], kvstore["password"] = _get_credentials()
+        kvstore_dirty = True
+
+    while True:
+        try:
+            # try to log in with given credentials
+            oc.login(kvstore["username"], kvstore["password"])
+
+            # login worked: save credentials if they're new, break loop
+            if kvstore_dirty:
+                kvstore.sync()
+            return True
+        except owncloud.HTTPResponseError as e:
+            if e.status_code == 401:  # auth failure: read credentials again
+                print("Authentication Failure.")
+                kvstore["username"], kvstore["password"] = _get_credentials()
+                kvstore_dirty = True
+            else:  # other owncloud error
+                logging.error("Upload failed. Owncloud Server reply: {}".format(e.status_code))
+                return False
+        except RuntimeError as e:  # any other error
+            logging.error("Upload failed. Error details: {}".format(e))
+            return False
+
+
+def _get_credentials():
+    from getpass import getpass
+
+    user = getpass("OwnCloud username:")
+    password = getpass("OwnCloud password:")
+
+    return user, password
 
