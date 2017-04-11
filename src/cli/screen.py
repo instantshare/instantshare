@@ -20,6 +20,7 @@ from tools import dirs
 from tools.config import CONFIG
 from tools.encryption import CryptoError
 from tools.persistence import KVStore, PersistentDataEncryptedError
+from gui.dialogs import text_input as input_dialog
 from importlib import import_module
 from tempfile import gettempdir
 from time import strftime
@@ -35,21 +36,22 @@ def _load_persistent_data(module: str):
         user = getpass.getuser()
         pw = keyring.get_password("instantshare", user)
         if pw is None:
-            pw = getpass.getpass("Please enter your encryption password:")
+            pw = input_dialog("Encryption password", "Please enter your encryption password:", hidden=True)
             keyring.set_password("instantshare", user, pw)
 
         while True:
             try:
                 return KVStore(module, pw)
             except CryptoError:
-                pw = getpass.getpass("[Decryption Failure] Enter password:")
+                pw = input_dialog("Decryption Failure", "Please enter the correct password:", hidden=True)
 
     else:
         try:
             return KVStore(module)
         except PersistentDataEncryptedError:
-            pw = getpass.getpass("Previous encryption password (one last time):")
-
+            pw = input_dialog("Encryption Password",
+                              "Please enter your previous encryption password (one last time):",
+                              hidden=True)
             while True:
                 try:
                     kvs = KVStore(module, pw, unlock=True)
@@ -61,7 +63,7 @@ def _load_persistent_data(module: str):
                         pass  # password did not exist, so we don't need to remove it
                     return kvs
                 except CryptoError:
-                    pw = getpass.getpass("[Decryption Failure] Enter password:")
+                    pw = input_dialog("Decryption Failure", "Please enter the correct password:", hidden=True)
 
 
 def main(argv):
