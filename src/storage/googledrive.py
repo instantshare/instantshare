@@ -11,15 +11,15 @@ from oauth2client import client
 from oauth2client import tools
 import logging
 from tools.config import CONFIG
-from tools.persistence import KVStore
+from tools.persistence import KVStub
 
 SCOPES = 'https://www.googleapis.com/auth/drive'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Instantshare'
-
 _name = "googledrive"
-# TODO: encryption
-kvstore = KVStore(_name)
+
+kvstore = KVStub()
+
 
 # FIXME: There is several problems with this:
 # - does not use the common oauthtool

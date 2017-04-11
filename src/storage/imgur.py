@@ -5,11 +5,10 @@ from imgurpython.helpers.error import ImgurClientError
 
 from tools.config import CONFIG
 from tools.oauthtool import implicit_flow
-from tools.persistence import KVStore
+from tools.persistence import KVStub
 
 _name = "imgur"
-# TODO: encryption
-kvstore = KVStore(_name)
+kvstore = KVStub()
 
 
 def upload(file: str) -> str:

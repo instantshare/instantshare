@@ -6,11 +6,10 @@ from dropbox.files import WriteMode
 
 from tools.config import CONFIG
 from tools.oauthtool import implicit_flow
-from tools.persistence import KVStore
+from tools.persistence import KVStub
 
 _name = "dropbox"
-# TODO: encryption
-kvstore = KVStore(_name)
+kvstore = KVStub()
 
 
 def upload(file: str) -> str:
@@ -28,13 +27,14 @@ def upload(file: str) -> str:
 
     try:
         dropbox_client.files_upload(
-            file_object,
+            file_object.read(),
             dropbox_filepath,
             mode=WriteMode("overwrite", None),
             client_modified=None,
             mute=False
         )
     except dropbox.exceptions.ApiError as e:
+        # FIXME: 'ApiError' object has no attribute 'error_msg'
         logging.error("Upload failed. Error message: {0}".format(e.error_msg))
         return None
 

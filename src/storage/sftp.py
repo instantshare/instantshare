@@ -5,11 +5,10 @@ import sys
 import paramiko
 
 from tools.config import CONFIG
-from tools.persistence import KVStore
+from tools.persistence import KVStub
 
 _name = "sftp"
-# TODO: encryption
-kvstore = KVStore(_name)
+kvstore = KVStub()
 
 # Load SFTP server info from config file
 HOSTNAME = CONFIG.get(_name, "hostname")
@@ -72,12 +71,12 @@ def _connect():
     # Start SSH session based on authentication type
     try:
         if AUTHENTICATION_TYPE == "password":
-            # FIXME: Use encrypted KVStore for password
+            # FIXME: Use KVStore instance for password
             password = CONFIG.get(_name, "password")
             transport.connect(username=USERNAME, password=password)
 
         elif AUTHENTICATION_TYPE == "key":
-            # FIXME: Use encrypted KVStore for password
+            # FIXME: Use KVStore instance for password
             key_filepath = CONFIG.get(_name, "key_filepath")
             key_passphrase = CONFIG.get(_name, "key_passphrase")
             private_key = paramiko.RSAKey.from_private_key_file(key_filepath, key_passphrase)

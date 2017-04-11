@@ -50,7 +50,7 @@ Linux
 
 .. code-block:: bash
 
-    $ pip install -r requirements.txt
+    $ pip install -r requirements-linux.txt
 
 Run the app
 ===========
