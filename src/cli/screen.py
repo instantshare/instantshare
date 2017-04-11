@@ -29,7 +29,12 @@ from time import strftime
 def _load_persistent_data(module: str):
     encryption = CONFIG.get(CONFIG.general, "encryption")
     if encryption == "password":
-        pass
+        pw = input_dialog("Encryption password", "Please enter your encryption password:", hidden=True)
+        while True:
+            try:
+                return KVStore(module, pw)
+            except CryptoError:
+                pw = input_dialog("Decryption Failure", "Please enter the correct password:", hidden=True)
 
     elif encryption == "keyring":
         # retrieve password from keyring or create one
