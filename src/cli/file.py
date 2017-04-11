@@ -1,5 +1,5 @@
 """
-Take a cropped screenshot and share its public URL.
+Upload a local file and share its public URL.
 
 Usage: instantshare file [options] <filename>
 
