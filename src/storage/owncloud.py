@@ -26,7 +26,7 @@ def upload(file: str) -> str:
 
     # upload file
     oc.put_file(remotefile, file)
-    return str(oc.share_file_with_link(remotefile).get_link())
+    return _transform_url(str(oc.share_file_with_link(remotefile).get_link()))
 
 
 def _login(oc: owncloud.Client):
@@ -67,3 +67,7 @@ def _get_credentials():
 
     return user, password
 
+
+def _transform_url(url: str) -> str:
+    id = url.split("/")[-1]
+    return CONFIG.get(_name, "url") + "/index.php/apps/files_sharing/ajax/publicpreview.php?a=true&t=" + id
