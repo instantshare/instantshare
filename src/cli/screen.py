@@ -90,8 +90,18 @@ def main(argv):
         logging.debug("Screen capture cancelled.")
         return
 
+    play_sounds = CONFIG.getboolean(CONFIG.general, "notification_sound")
+
     # upload to storage
-    url = storage.upload(file)
+    try:
+        url = storage.upload(file)
+        if url is None:
+            raise RuntimeError
+    except:
+        if play_sounds:
+            import tools.audio as a
+            a.play_wave_file(dirs.res + "/error.wav")
+        return
     logging.info("Uploaded screenshot to: " + url)
 
     # execute user defined action
@@ -103,6 +113,6 @@ def main(argv):
         w.open_new_tab(url)
 
     # notify user if set
-    if CONFIG.getboolean(CONFIG.general, "notification_sound"):
+    if play_sounds:
         import tools.audio as a
         a.play_wave_file(dirs.res + "/notification.wav")
