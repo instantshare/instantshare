@@ -1,14 +1,13 @@
 ============
 instantshare
 ============
-Takes screenshots and instantly uploads them to Imgur, Dropbox, Google Drive, or even your own SFTP enabled server.
+Takes screenshots and instantly uploads them to Imgur, Dropbox, Google Drive, ownCloud or even your own SFTP enabled server.
 As soon as the upload is done, the public URL will be copied to your clipboard and you will get a notification to let you know you can start sharing the screenshot with your friends!
 
 Online storage providers possibly to be added in the future:
 
 - FTP Servers
-- Owncloud (once their API gets updated to Python 3)
-- ...
+- ... submit your favorite storage provider request via issue or implementation via pull request!
 
 At a later point, we would also like to enable you to share other types of media:
 

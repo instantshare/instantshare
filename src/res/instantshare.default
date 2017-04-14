@@ -13,7 +13,7 @@
 encryption = keyring
 
 # The hoster you want to upload your screenshots to.
-# Possible Values: imgur, dropbox, googledrive, sftp
+# Possible Values: imgur, dropbox, googledrive, sftp, owncloud
 storage = imgur
 
 # The base directory name for screenshots when using hosters like dropbox

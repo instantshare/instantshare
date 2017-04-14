@@ -15,7 +15,8 @@ setup(
         "dropbox",
         "google-api-python-client",
         "pillow",
-        "paramiko"
+        "paramiko",
+        "pyocclient"
     ],
     packages=["src", "src.screenshot", "src.storage", "src.tools"]
 )
