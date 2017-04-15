@@ -44,9 +44,7 @@ user_id = 0
 access_token = 0
 
 [googledrive]
-app_key = 0
-auth_url = 0
-scope = 0
+app_key = 101202535039-nnofrifa409n8psoc9sv6bcb434c44f3.apps.googleusercontent.com
 
 [owncloud]
 url = 0

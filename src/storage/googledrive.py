@@ -1,16 +1,14 @@
-from argparse import Namespace
-from googleapiclient import errors
-from googleapiclient.http import MediaFileUpload
-import httplib2
-import os
+import logging
 import ntpath
 
+import httplib2
 from apiclient import discovery
-import oauth2client
-from oauth2client import client
-from oauth2client import tools
-import logging
+from googleapiclient import errors
+from googleapiclient.http import MediaFileUpload
+from oauth2client.client import AccessTokenCredentials
+
 from tools.config import CONFIG
+from tools.oauthtool import implicit_flow
 from tools.persistence import KVStub
 
 SCOPES = 'https://www.googleapis.com/auth/drive'
@@ -21,22 +19,19 @@ _name = "googledrive"
 kvstore = KVStub()
 
 
-# FIXME: There is several problems with this:
-# - does not use the common oauthtool
-# - does not use the implicit flow
-# - saves data in arbitrary locations
-
-
 def upload(file: str) -> str:
-    flags = Namespace(
-        auth_host_name='localhost',
-        auth_host_port=[8080, 8090],
-        logging_level='ERROR',
-        noauth_local_webserver=False
-    )
-    credentials = _get_credentials(flags)
+    # TODO: Use another way to find out if the access token is valid
+    # FIXME: Check for authorization failure
+    if "access_token" not in kvstore.keys():
+        authorization_successful = _authorize()
+        if not authorization_successful:
+            return None  # unable to upload without successful authorization
+
+    credentials = AccessTokenCredentials(kvstore["access_token"], "test")
     http = credentials.authorize(httplib2.Http())
-    service = discovery.build('drive', 'v2', http=http)
+
+    service = discovery.build('drive', 'v2', http=http, cache_discovery=False)
+
     # Returns a list of folders in the root directory with a title equaling the screenshot_dir
     results = service.files().list(
         q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder'"
@@ -90,30 +85,19 @@ def upload(file: str) -> str:
         return None
 
 
-def _get_credentials(flags):
-    """
-    Taken from: https://developers.google.com/drive/web/quickstart/python
-    Gets valid user credentials from storage.
+def _authorize():
+    authorization_endpoint = "https://accounts.google.com/o/oauth2/v2/auth"
+    app_key = CONFIG.get(_name, "app_key")
 
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
+    # Start OAuth2 implicit flow
+    auth_response = implicit_flow(authorization_endpoint, app_key, scope=[SCOPES])
 
-    Returns:
-        Credentials, the obtained credential.
-        Type: oauth2client.client.Credentials
-    """
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'drive-python-quickstart.json')
+    # Check if authorization was successful
+    if "error" in auth_response and auth_response["error"] is not None:
+        logging.error("Authentication failed. Error message: {0}".format(auth_response["error_description"]))
+        return False
 
-    store = oauth2client.file.Storage(credential_path)
-    credentials = store.get()  # credentials is oauth2client.client.Credentials
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        credentials = tools.run_flow(flow, store, flags)
-        logging.info("Storing credentials to: %s", credential_path)
-    return credentials
+    kvstore["access_token"] = auth_response["access_token"]
+    kvstore.sync()
+
+    return True
