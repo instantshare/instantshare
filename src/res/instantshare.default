@@ -50,8 +50,6 @@ scope = 0
 
 [owncloud]
 url = 0
-username = 0
-password = 0
 
 [sftp]
 hostname = example.com
