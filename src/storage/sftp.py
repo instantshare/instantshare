@@ -68,25 +68,40 @@ def _connect():
         logging.error("Connection to the host failed. Check hostname and port.")
         sys.exit(0)
 
-    # Start SSH session based on authentication type
-    try:
-        if AUTHENTICATION_TYPE == "password":
-            # FIXME: Use KVStore instance for password
-            password = CONFIG.get(_name, "password")
-            transport.connect(username=USERNAME, password=password)
+    kvstore_dirty = False
 
-        elif AUTHENTICATION_TYPE == "key":
-            # FIXME: Use KVStore instance for password
-            key_filepath = CONFIG.get(_name, "key_filepath")
-            key_passphrase = CONFIG.get(_name, "key_passphrase")
-            private_key = paramiko.RSAKey.from_private_key_file(key_filepath, key_passphrase)
-            transport.connect(username=USERNAME, pkey=private_key)
+    # initial case: no username or password present
+    if "username" not in kvstore.keys() or "password" not in kvstore.keys():
+        kvstore["username"], kvstore["password"] = _get_credentials()
+        kvstore_dirty = True
 
-        else:
-            logging.error("Unknown authentication type.")
+    while True:
+        try:
+            if AUTHENTICATION_TYPE == "password":
+                transport.connect(username=kvstore["username"], password=kvstore["password"])
+                break
+            elif AUTHENTICATION_TYPE == "key":
+                key_filepath = CONFIG.get(_name, "key_filepath")
+                private_key = paramiko.RSAKey.from_private_key_file(key_filepath, kvstore["password"])
+                transport.connect(username=kvstore["username"], pkey=private_key)
+                break
+            else:
+                logging.error("Unknown authentication type")
+        except paramiko.ssh_exception.AuthenticationException:
+            logging.info("Authentication failed, prompting the user again.")
+            kvstore["username"], kvstore["password"] = _get_credentials()
+            kvstore_dirty = True
 
-    except paramiko.ssh_exception.AuthenticationException:
-        logging.error("Login failed. Check username and password or private key and passphrase.")
-        sys.exit(0)
+    if kvstore_dirty:
+        kvstore.sync()
 
     return transport, paramiko.SFTPClient.from_transport(transport)
+
+def _get_credentials():
+    from gui.dialogs import text_input
+
+    prompt = "password" if AUTHENTICATION_TYPE == "password" else "key passphrase"
+    user = text_input("SFTP username", "Enter your SFTP username, please!")
+    password = text_input("SFTP {}".format(prompt), "Enter your SFTP {} again, please!".format(prompt))
+
+    return user, password
