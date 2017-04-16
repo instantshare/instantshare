@@ -10,7 +10,7 @@
 #   - None (or leave it empty): No encryption will be used
 #   - password: you will be asked to enter a password everytime you use instantshare
 #   - keyring: create a password and store it in the system keyring
-encryption =
+encryption = keyring
 
 # The hoster you want to upload your media to.
 # Compatibility matrix:

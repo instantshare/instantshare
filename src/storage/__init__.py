@@ -5,6 +5,7 @@ from importlib import import_module
 
 import keyring
 
+from gui.dialogs import text_input
 from tools import dirs
 from tools.config import CONFIG
 from tools.encryption import CryptoError
@@ -38,32 +39,37 @@ def upload_video(path: str):
 def upload_to(hoster: str, path: str):
     _upload(_hoster_called(hoster), path)
 
-
 def _load_persistent_data(module: str):
     encryption = CONFIG.get(CONFIG.general, "encryption")
     if encryption == "password":
-        pass
+        pw = text_input("Encryption password", "Please enter your encryption password:", hidden=True)
+        while True:
+            try:
+                return KVStore(module, pw)
+            except CryptoError:
+                pw = text_input("Decryption Failure", "Please enter the correct password:", hidden=True)
 
     elif encryption == "keyring":
         # retrieve password from keyring or create one
         user = getpass.getuser()
         pw = keyring.get_password("instantshare", user)
         if pw is None:
-            pw = getpass.getpass("Please enter your encryption password:")
+            pw = text_input("Encryption password", "Please enter your encryption password:", hidden=True)
             keyring.set_password("instantshare", user, pw)
 
         while True:
             try:
                 return KVStore(module, pw)
             except CryptoError:
-                pw = getpass.getpass("[Decryption Failure] Enter password:")
+                pw = text_input("Decryption Failure", "Please enter the correct password:", hidden=True)
 
     else:
         try:
             return KVStore(module)
         except PersistentDataEncryptedError:
-            pw = getpass.getpass("Previous encryption password (one last time):")
-
+            pw = text_input("Encryption Password",
+                              "Please enter your previous encryption password (one last time):",
+                              hidden=True)
             while True:
                 try:
                     kvs = KVStore(module, pw, unlock=True)
@@ -75,7 +81,7 @@ def _load_persistent_data(module: str):
                         pass  # password did not exist, so we don't need to remove it
                     return kvs
                 except CryptoError:
-                    pw = getpass.getpass("[Decryption Failure] Enter password:")
+                    pw = text_input("Decryption Failure", "Please enter the correct password:", hidden=True)
 
 
 def _hoster_called(name: str):

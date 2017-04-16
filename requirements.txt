@@ -8,3 +8,4 @@ imgurpython
 pillow
 pyaudio
 appdirs
+pyocclient==0.4
