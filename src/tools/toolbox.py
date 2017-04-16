@@ -1,5 +1,4 @@
-from tempfile import gettempdir
-from time import sleep, strftime
+from time import sleep
 from abc import ABCMeta, abstractmethod
 from sys import platform as _platform
 
@@ -33,7 +32,3 @@ class Platform(metaclass=ABCMeta):
             raise OSError("Platform not supported!")
         else:
             init_functions[_platform]()
-
-
-def build_filename(media_type: str):
-    return "{}/instantshare_{}_{}.png".format(gettempdir(), media_type, strftime("%Y-%m-%d_%H-%I-%S"))

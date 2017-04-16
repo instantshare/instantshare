@@ -16,7 +16,7 @@ from importlib import import_module
 from docopt import docopt
 
 import storage
-from tools import toolbox
+from tools import dirs
 from tools.config import CONFIG
 
 
@@ -28,7 +28,7 @@ def main(argv):
     scrtool = import_module("screenshot." + scrtool_str)
 
     # build filename
-    file = toolbox.build_filename("screenshot")
+    file = dirs.build_filename(dirs.MediaTypes.SCREENSHOT)
 
     # take screenshot
     if args["--whole"]:

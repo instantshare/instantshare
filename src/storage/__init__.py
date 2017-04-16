@@ -39,6 +39,7 @@ def upload_video(path: str):
 def upload_to(hoster: str, path: str):
     _upload(_hoster_called(hoster), path)
 
+
 def _load_persistent_data(module: str):
     encryption = CONFIG.get(CONFIG.general, "encryption")
     if encryption == "password":
