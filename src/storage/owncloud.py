@@ -1,9 +1,10 @@
-import owncloud
-import ntpath
 import logging
+import ntpath
 
-from tools.persistence import KVStub
+import owncloud
+
 from tools.config import CONFIG
+from tools.persistence import KVStub
 
 _name = "owncloud"
 kvstore = KVStub()
@@ -60,10 +61,10 @@ def _login(oc: owncloud.Client):
 
 
 def _get_credentials():
-    from getpass import getpass
+    from gui.dialogs import text_input
 
-    user = getpass("OwnCloud username:")
-    password = getpass("OwnCloud password:")
+    user = text_input("OwnCloud Account", "OwnCloud Username:")
+    password = text_input("OwnCloud Account", "OwnCloud password:", True)
 
     return user, password
 
