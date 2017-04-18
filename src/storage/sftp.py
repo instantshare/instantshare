@@ -13,7 +13,6 @@ kvstore = KVStub()
 # Load SFTP server info from config file
 HOSTNAME = CONFIG.get(_name, "hostname")
 PORT = CONFIG.getint(_name, "port")
-USERNAME = CONFIG.get(_name, "username")
 AUTHENTICATION_TYPE = CONFIG.get(_name, "authentication_type")
 SFTP_BASE_DIR = CONFIG.get(_name, "base_dir")
 
@@ -71,8 +70,9 @@ def _connect():
     kvstore_dirty = False
 
     # initial case: no username or password present
-    if "username" not in kvstore.keys() or "password" not in kvstore.keys():
-        kvstore["username"], kvstore["password"] = _get_credentials()
+    if "username" not in kvstore.keys() or "password" not in kvstore.keys() or "key passphrase" not in kvstore.keys():
+        prompt = "password" if AUTHENTICATION_TYPE == "password" else "key passphrase"
+        kvstore["username"], kvstore[prompt] = _get_credentials(prompt)
         kvstore_dirty = True
 
     while True:
@@ -82,14 +82,15 @@ def _connect():
                 break
             elif AUTHENTICATION_TYPE == "key":
                 key_filepath = CONFIG.get(_name, "key_filepath")
-                private_key = paramiko.RSAKey.from_private_key_file(key_filepath, kvstore["password"])
+                private_key = paramiko.RSAKey.from_private_key_file(key_filepath, kvstore["key passphrase"])
                 transport.connect(username=kvstore["username"], pkey=private_key)
                 break
             else:
                 logging.error("Unknown authentication type")
         except paramiko.ssh_exception.AuthenticationException:
             logging.info("Authentication failed, prompting the user again.")
-            kvstore["username"], kvstore["password"] = _get_credentials()
+            prompt = "password" if AUTHENTICATION_TYPE == "password" else "key passphrase"
+            kvstore["username"], kvstore[prompt] = _get_credentials(prompt)
             kvstore_dirty = True
 
     if kvstore_dirty:
@@ -97,11 +98,10 @@ def _connect():
 
     return transport, paramiko.SFTPClient.from_transport(transport)
 
-def _get_credentials():
+def _get_credentials(prompt):
     from gui.dialogs import text_input
 
-    prompt = "password" if AUTHENTICATION_TYPE == "password" else "key passphrase"
     user = text_input("SFTP username", "Enter your SFTP username, please!")
-    password = text_input("SFTP {}".format(prompt), "Enter your SFTP {} again, please!".format(prompt))
+    password = text_input("SFTP {}".format(prompt), "Enter your SFTP {} please!".format(prompt), hidden=True)
 
     return user, password
