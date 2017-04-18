@@ -11,9 +11,8 @@ from tools.config import CONFIG
 from tools.oauthtool import implicit_flow
 from tools.persistence import KVStub
 
+AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
 SCOPES = 'https://www.googleapis.com/auth/drive'
-CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'Instantshare'
 _name = "googledrive"
 
 kvstore = KVStub()
@@ -86,11 +85,10 @@ def upload(file: str) -> str:
 
 
 def _authorize():
-    authorization_endpoint = "https://accounts.google.com/o/oauth2/v2/auth"
     app_key = CONFIG.get(_name, "app_key")
 
     # Start OAuth2 implicit flow
-    auth_response = implicit_flow(authorization_endpoint, app_key, scope=[SCOPES])
+    auth_response = implicit_flow(AUTHORIZATION_ENDPOINT, app_key, scope=[SCOPES])
 
     # Check if authorization was successful
     if "error" in auth_response and auth_response["error"] is not None:
