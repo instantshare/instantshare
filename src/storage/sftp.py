@@ -70,10 +70,16 @@ def _connect():
     kvstore_dirty = False
 
     # initial case: no username or password present
-    if "username" not in kvstore.keys() or "password" not in kvstore.keys() or "key passphrase" not in kvstore.keys():
-        prompt = "password" if AUTHENTICATION_TYPE == "password" else "key passphrase"
-        kvstore["username"], kvstore[prompt] = _get_credentials(prompt)
-        kvstore_dirty = True
+    if AUTHENTICATION_TYPE == "password":
+        if "username" not in kvstore.keys() or "password" not in kvstore.keys():
+            kvstore["username"], kvstore["password"] = _get_credentials("password")
+            kvstore_dirty = True
+    elif AUTHENTICATION_TYPE == "key":
+        if "username" not in kvstore.keys() or "key passphrase" not in kvstore.keys():
+            kvstore["username"], kvstore["key passphrase"] = _get_credentials("key passphrase")
+            kvstore_dirty = True
+    else:
+        logging.error("Unknown authentication type")
 
     while True:
         try:
@@ -97,6 +103,7 @@ def _connect():
         kvstore.sync()
 
     return transport, paramiko.SFTPClient.from_transport(transport)
+
 
 def _get_credentials(prompt):
     from gui.dialogs import text_input
