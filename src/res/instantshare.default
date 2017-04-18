@@ -50,7 +50,8 @@ hostname = example.com
 # Base directory for files (. is home directory of user)
 base_dir = .
 port = 22
-authentication_type = password OR key
+# Possible Values: password, key
+authentication_type = password
 # Authentication type key
 key_filepath = 0
 
