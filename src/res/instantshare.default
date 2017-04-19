@@ -20,7 +20,7 @@ storage = imgur
 screenshot_dir = Screenshots
 
 # The screenshot tool to use. The name corresponds to the name of the python modules in the screenshot package.
-# Possible Values: windows_tk (Windows only), gnome_screenshot (Linux only)
+# Possible Values: windows_tk (Windows only), snippingtool (Windows 10 Creators Update only), gnome_screenshot (Linux only)
 screenshot_tool = $SCREENSHOT_TOOL
 
 # Whether or not to automatically copy the public URL to the uploaded medium to the clipboard.
