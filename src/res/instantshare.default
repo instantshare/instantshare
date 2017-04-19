@@ -38,32 +38,21 @@ screenshot_whole = Lcontrol+Lshift+3
 
 [dropbox]
 app_key = 81glnb2w8xfo0lz
-auth_url = 0
-scope = 0
-user_id = 0
-access_token = 0
 
 [googledrive]
-app_key = 0
-auth_url = 0
-scope = 0
+app_key = 774886165931-ks0ntcb32p1mhi0nnv8tcmob81e0oetj.apps.googleusercontent.com
 
 [owncloud]
 url = 0
-username = 0
-password = 0
 
 [sftp]
 hostname = example.com
 # Base directory for files (. is home directory of user)
 base_dir = .
 port = 22
-username = 0
-authentication_type = password OR key
-# Authentication type password
-password = 0
+# Possible Values: password, key
+authentication_type = password
 # Authentication type key
-key_passphrase = 0
 key_filepath = 0
 
 [imgur]
