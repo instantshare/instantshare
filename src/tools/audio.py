@@ -1,11 +1,12 @@
 import pyaudio
 import wave
+import threading
 
 # define the amount of data to be read at once from the wave file
 _buffer_size = 1024
 
 
-def play_wave_file(path):
+def _play_wave_file(path):
     # open the wave file
     wf = wave.open(path, 'rb')
 
@@ -30,3 +31,8 @@ def play_wave_file(path):
     stream.stop_stream()
     stream.close()
     p.terminate()
+
+
+def play_wave_file(path):
+    play_thread = threading.Thread(target=_play_wave_file, args=(path,))
+    play_thread.start()
