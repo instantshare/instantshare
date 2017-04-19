@@ -12,9 +12,21 @@
 #   - keyring: create a password and store it in the system keyring
 encryption = keyring
 
-# The hoster you want to upload your screenshots to.
-# Possible Values: imgur, dropbox, googledrive, sftp, owncloud
-storage = imgur
+# The hoster you want to upload your media to.
+# Compatibility matrix:
+#
+# HOSTER            SCREENSHOTS FILES AUDIO VIDEO TEXT
+# imgur                  y        n     n     n     n
+# dropbox                y        y     y     y     y
+# googledrive            y        y     y     y     y
+# sftp                   y        y     y     y     y
+# owncloud               y        y     y     y     y
+#
+storage_screenshots = imgur
+storage_files = dropbox
+storage_audio = dropbox
+storage_videos =
+storage_text =
 
 # The base directory name for screenshots when using hosters like dropbox
 screenshot_dir = Screenshots
