@@ -13,5 +13,5 @@ def take_screenshot_whole(path):
 def take_screenshot_crop(path):
     call(["snippingtool", "/clip"])
     image = ImageGrab.grabclipboard()
-    if image != None:
+    if image is not None:
         image.save(path, "png")
