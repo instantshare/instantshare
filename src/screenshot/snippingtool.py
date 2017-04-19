@@ -7,7 +7,7 @@ _r = Robot()
 
 def take_screenshot_whole(path):
     image = _r.take_screenshot()
-    image.save(path, "PNG")
+    image.save(path, "png")
 
 
 def take_screenshot_crop(path):
