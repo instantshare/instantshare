@@ -28,7 +28,7 @@ temp = gettempdir()
 
 
 class MediaTypes(enum.Enum):
-    SCREENSHOT = "screenshot"
+    SCREENSHOT = "screen"
     AUDIO = "audio"
     TEXT = "text"
     VIDEO = "video"
@@ -49,9 +49,9 @@ def build_filename(media_type: MediaTypes) -> str:
         MediaTypes.VIDEO: ".webm"
     }.get(media_type, "")
 
-    return "{0}/instantshare_{1}_{2}{3}".format(
+    return "{0}/instant{1}_{2}{3}".format(
         gettempdir(),
-        media_type,
+        media_type.value,
         strftime("%Y-%m-%d_%H-%I-%S"),
         file_extension
     )
@@ -62,3 +62,4 @@ if __name__ == "__main__":
     print("Config dir:   " + configs)
     print("Cache dir:    " + cache)
     print("Userdata dir: " + data)
+
