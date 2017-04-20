@@ -44,7 +44,7 @@ cb_autocopy = True
 # Possible Values: True, False
 notification_sound = True
 
-# Whether or not to show a notification toast when the upload is done.
+# Whether or not to show a notification text when the upload is done.
 # Possible Values: True, False
 notification_toast = False
 
