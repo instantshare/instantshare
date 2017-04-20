@@ -7,7 +7,20 @@ class Toast(Platform):
         super().__init__()
 
     def init_linux(self):
-        pass
+        def show(title, message, icon=None, timeout=0):
+            from subprocess import Popen, PIPE
+            import shlex
+            cmd = shlex.split(
+                "notify-send --icon={icon} --expire-time={timeout} \"{title}\" \"{message}\"".format(
+                    icon=str(icon),
+                    timeout=str(timeout * 1000),
+                    title=title,
+                    message=message
+                )
+            )
+            Popen(cmd).communicate()
+
+        self.show = show
 
     def init_windows(self):
         def s(title, message, icon=None, timeout=0):
