@@ -21,12 +21,14 @@ encryption = keyring
 # googledrive            y        y     y     y     y
 # sftp                   y        y     y     y     y
 # owncloud               y        y     y     y     y
+# twitter_intent         n        n     n     n     y
+# pastebin               n        n     n     n     y
 #
 storage_screenshots = imgur
 storage_files = dropbox
 storage_audio = dropbox
 storage_videos =
-storage_text =
+storage_text = pastebin
 
 # The base directory name for screenshots when using hosters like dropbox
 screenshot_dir = Screenshots
@@ -69,3 +71,6 @@ key_filepath = 0
 
 [imgur]
 client_id = a5e814c239e21f0
+
+[pastebin]
+app_key = adddc74baf0cd6344fdc1f20f47355b0
