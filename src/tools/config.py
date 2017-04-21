@@ -1,6 +1,5 @@
 from configparser import ConfigParser
 from tools import dirs
-import logging
 from os import path
 
 
@@ -55,7 +54,6 @@ class Config(ConfigParser):
                 raise IOError
             super().read([self._file])
         except IOError as e:
-            logging.error(e)
             # No config file, create one with default values
             self.__default_config()
 
