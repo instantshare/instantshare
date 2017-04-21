@@ -34,7 +34,7 @@ def main(argv):
     with WaveRecorder() as rec:
 
         # record audio
-        if args["--stdin"]:  # TODO redo when GUI implemented
+        if args["--stdin"]:
             rec.start_record()
             input()
             rec.stop_record()
@@ -42,14 +42,18 @@ def main(argv):
             rec.start_record()
             sleep(int(args["--seconds"]))
             rec.stop_record()
-
-        # TODO preview recording to user before upload
+        else:  # default: GUI
+            import gui.dialogs as d
+            rec.start_record()
+            do_upload = d.ok_cancel("Recording...", "Hit [Ok] to upload, [Cancel] to abort.")
+            rec.stop_record()
+            if not do_upload:
+                return None
 
         # save recording
         rec.save(file_path)
 
     # upload to storage
-    # upload
     hoster = args["--storage"]
     if hoster:
         storage.upload_to(hoster, file_path)
