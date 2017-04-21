@@ -1,14 +1,40 @@
 [General]
 
-# The hoster you want to upload your screenshots to.
-# Possible Values: imgur, dropbox, googledrive, sftp
-storage = imgur
+# How (or if at all) to encrypt data that is used to access your storage provider.
+# This includes:
+#   - access tokens (allow usage the service in question in your name)
+#   - credentials (username and password)
+#   - passphrases for key files
+#
+# Possible values:
+#   - None (or leave it empty): No encryption will be used
+#   - password: you will be asked to enter a password everytime you use instantshare
+#   - keyring: create a password and store it in the system keyring
+encryption = keyring
+
+# The hoster you want to upload your media to.
+# Compatibility matrix:
+#
+# HOSTER            SCREENSHOTS FILES AUDIO VIDEO TEXT
+# imgur                  y        n     n     n     n
+# dropbox                y        y     y     y     y
+# googledrive            y        y     y     y     y
+# sftp                   y        y     y     y     y
+# owncloud               y        y     y     y     y
+# twitter_intent         n        n     n     n     y
+# pastebin               n        n     n     n     y
+#
+storage_screenshots = imgur
+storage_files = dropbox
+storage_audio = dropbox
+storage_videos =
+storage_text = pastebin
 
 # The base directory name for screenshots when using hosters like dropbox
 screenshot_dir = Screenshots
 
 # The screenshot tool to use. The name corresponds to the name of the python modules in the screenshot package.
-# Possible Values: windows_tk (Windows only), gnome_screenshot (Linux only)
+# Possible Values: windows_tk (Windows only), snippingtool (Windows 10 Creators Update only), gnome_screenshot (Linux only)
 screenshot_tool = $SCREENSHOT_TOOL
 
 # Whether or not to automatically copy the public URL to the uploaded medium to the clipboard.
@@ -26,33 +52,25 @@ screenshot_whole = Lcontrol+Lshift+3
 
 [dropbox]
 app_key = 81glnb2w8xfo0lz
-auth_url = 0
-scope = 0
-user_id = 0
-access_token = 0
 
 [googledrive]
-app_key = 0
-auth_url = 0
-scope = 0
+app_key = 774886165931-ks0ntcb32p1mhi0nnv8tcmob81e0oetj.apps.googleusercontent.com
 
 [owncloud]
 url = 0
-username = 0
-password = 0
 
 [sftp]
 hostname = example.com
 # Base directory for files (. is home directory of user)
 base_dir = .
 port = 22
-username = 0
-authentication_type = password OR key
-# Authentication type password
-password = 0
+# Possible Values: password, key
+authentication_type = password
 # Authentication type key
-key_passphrase = 0
 key_filepath = 0
 
 [imgur]
 client_id = a5e814c239e21f0
+
+[pastebin]
+app_key = adddc74baf0cd6344fdc1f20f47355b0

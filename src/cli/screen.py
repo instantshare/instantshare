@@ -9,27 +9,26 @@ Options:
   --tool=<tool>         Overwrite the screenshot_tool config parameter
   --storage=<provider>  Overwrite the storage config parameter
 """
+import logging
 import os
+from importlib import import_module
 
 from docopt import docopt
+
+import storage
+from tools import dirs
 from tools.config import CONFIG
-from importlib import import_module
-from tempfile import gettempdir
-from time import strftime
-import logging
 
 
 def main(argv):
     args = docopt(__doc__, argv=argv)
 
     # import modules dynamically
-    scrtool = args["--tool"] if args["--tool"] else CONFIG.get(CONFIG.general, "screenshot_tool")
-    storage = args["--storage"] if args["--storage"] else CONFIG.get(CONFIG.general, "storage")
-    scrtool = import_module("screenshot." + scrtool)
-    storage = import_module("storage." + storage)
+    scrtool_str = args["--tool"] if args["--tool"] else CONFIG.get(CONFIG.general, "screenshot_tool")
+    scrtool = import_module("screenshot." + scrtool_str)
 
     # build filename
-    file = "{}/instantscreen_{}.png".format(gettempdir(), strftime("%Y-%m-%d_%H-%I-%S"))
+    file = dirs.build_filename(dirs.MediaTypes.SCREENSHOT)
 
     # take screenshot
     if args["--whole"]:
@@ -42,19 +41,7 @@ def main(argv):
         logging.debug("Screen capture cancelled.")
         return
 
-    # upload to storage
-    url = storage.upload(file)
-    logging.info("Uploaded screenshot to: " + url)
-
-    # execute user defined action
-    if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
-        import tools.clipboard as c
-        c.Clipboard().set(url)
+    if args["--storage"]:
+        storage.upload_to(args["--storage"], file)
     else:
-        import webbrowser as w
-        w.open_new_tab(url)
-
-    # notify user if set
-    if CONFIG.getboolean(CONFIG.general, "notification_sound"):
-        import tools.audio as a
-        a.play_wave_file("res/notification.wav")
+        storage.upload_screenshot(file)
