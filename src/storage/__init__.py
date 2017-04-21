@@ -16,12 +16,8 @@ def upload_generic_file(path: str):
     _upload(_hoster_for("files"), path)
 
 
-def upload_text(text: str):
-    # TODO come up with a strategy to make this elegant
-    # some storage options want a path
-    # text only hosters like pastebin probably only need a string -> always make a file in tempdir?
-    # Syntax Highlighting for pastebin? -> should be handled by pastebin.py
-    pass
+def upload_text(path: str):
+    _upload(_hoster_for("text"), path)
 
 
 def upload_audio(path: str):
@@ -104,8 +100,9 @@ def _upload(hoster, path):
     try:
         url = hoster.upload(path)
         if url is None:
-            raise RuntimeError
-    except:
+            raise Exception
+    except Exception as e:
+        logging.error("Error occured while uploading file to hoster:\n" + e)
         if play_sounds:
             import tools.audio as a
             a.play_wave_file(dirs.res + "/error.wav")
