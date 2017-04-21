@@ -16,34 +16,25 @@ Options:
   --seconds=<sec>      Record for <sec> seconds
   --storage=<storage>  Overwrite the storage config parameter
 """
-import logging
+
+from time import sleep
 
 from docopt import docopt
-from importlib import import_module
-from time import sleep, strftime
-from tempfile import gettempdir
 
+import storage
+from tools import dirs
 from tools.audio import WaveRecorder
-from tools.config import CONFIG
 
 
-# TODO this command shares a lot of code with screen.py
-# Somewhere, we need a file containing our generic program flows,
-# like build_filename(schema), upload(file), upload_done(url)
 def main(argv):
     args = docopt(__doc__, argv=argv)
 
-    # dynamic imports
-    storage = args["--storage"] if args["--storage"] else CONFIG.get(CONFIG.general, "storage")
-    storage = import_module("storage." + storage)
-
-    # build filename
-    path = "{}/recording_{}.wav".format(gettempdir(), strftime("%Y-%m-%d_%H-%I-%S"))
+    file_path = dirs.build_filename(dirs.MediaTypes.AUDIO)
 
     with WaveRecorder() as rec:
 
         # record audio
-        if args["--stdin"] or len(argv) == 1:  # TODO redo when GUI implemented
+        if args["--stdin"]:  # TODO redo when GUI implemented
             rec.start_record()
             input()
             rec.stop_record()
@@ -55,21 +46,12 @@ def main(argv):
         # TODO preview recording to user before upload
 
         # save recording
-        rec.save(path)
+        rec.save(file_path)
 
     # upload to storage
-    url = storage.upload(path)
-    logging.info("Uploaded recording to: " + url)
-
-    # execute user defined action
-    if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
-        import tools.clipboard as c
-        c.Clipboard().set(url)
+    # upload
+    hoster = args["--storage"]
+    if hoster:
+        storage.upload_to(hoster, file_path)
     else:
-        import webbrowser as w
-        w.open_new_tab(url)
-
-    # notify user if set
-    if CONFIG.getboolean(CONFIG.general, "notification_sound"):
-        import tools.audio as a
-        a.play_wave_file("res/notification.wav")
+        storage.upload_audio(file_path)
