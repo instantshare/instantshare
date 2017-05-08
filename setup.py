@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="instantshare",
-    version="0.1dev",
+    version="0.2",
     description="Tool for taking screenshots and instantly sharing them using a number of services",
     long_description="\n" + open("README.rst").read(),
     author="instantshare",
