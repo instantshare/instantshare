@@ -1,6 +1,5 @@
-import logging
-
 import getpass
+import logging
 from importlib import import_module
 
 import keyring
@@ -65,8 +64,8 @@ def _load_persistent_data(module: str):
             return KVStore(module)
         except PersistentDataEncryptedError:
             pw = text_input("Encryption Password",
-                              "Please enter your previous encryption password (one last time):",
-                              hidden=True)
+                            "Please enter your previous encryption password (one last time):",
+                            hidden=True)
             while True:
                 try:
                     kvs = KVStore(module, pw, unlock=True)
@@ -95,6 +94,7 @@ def _hoster_for(media_type: str):
 
 def _upload(hoster, path):
     play_sounds = CONFIG.getboolean(CONFIG.general, "notification_sound")
+    show_notifications = CONFIG.getboolean(CONFIG.general, "notification_toast")
 
     # upload to storage
     try:
@@ -106,6 +106,10 @@ def _upload(hoster, path):
         if play_sounds:
             import tools.audio as a
             a.play_wave_file(dirs.res + "/error.wav")
+        if show_notifications:
+            from tools.toast import Toast
+            t = Toast()
+            t.show("Error", "Failed to upload media.")
         return
     logging.info("Uploaded file to: " + url)
 
@@ -121,3 +125,7 @@ def _upload(hoster, path):
     if play_sounds:
         import tools.audio as a
         a.play_wave_file(dirs.res + "/notification.wav")
+    if show_notifications:
+        from tools.toast import Toast
+        t = Toast()
+        t.show("Upload Finished", "Media upload was successful.")
