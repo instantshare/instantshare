@@ -1,64 +1,67 @@
 from configparser import ConfigParser
-from tools import dirs
 from os import path
 
+import tools.dirs as dirs
 
-class Config(ConfigParser):
+config = {}
+general = "General"
+
+__config_file = dirs.configs + "/instantshare.conf"
+__default_file = dirs.res + "/instantshare.default"
+
+
+def __dynamic_defaults():
     """
-    Wrapper Class for ConfigParser, includes default config, automated read on create, etc.
-    Usage:
-        1. get config object from module, get config parameters using type safe methods:
-            - get() (str)
-            - getint()
-            - getboolean()
-            - getfloat()
-        2. Only call read if you want it to read the file again
-        3. Only call write if you made configuration changes and want to save them
+    Used to get all elements for the default configuration that can only
+    be determined at runtime, for example platform-specific options.
+    :return: Dictionary with config variables to replace.
     """
-    general = "General"
-    _file = dirs.configs + "/instantshare.conf"
-    _default = dirs.res + "/instantshare.default"
+    from sys import platform
+    if platform == "linux":
+        return {"$SCREENSHOT_TOOL": "gnome_screenshot"}
+    elif platform == "win32":
+        return {"$SCREENSHOT_TOOL": "windows_tk"}
 
-    def __init__(self):
-        super().__init__()
-        self.read()
 
-    def __dynamic_defaults(self):
-        """
-        Used to get all elements for the default configuration that can only
-        be determined at runtime, for example platform-specific options.
-        :return: Dictionary with config variables to replace.
-        """
-        from sys import platform
-        if platform == "linux":
-            return {"$SCREENSHOT_TOOL": "gnome_screenshot"}
-        elif platform == "win32":
-            return {"$SCREENSHOT_TOOL": "windows_tk"}
+def read(file: str=__config_file) -> dict:
+    """
+    Read config file and initialize this module.
+    :raises IOError: when config file does not exist.
+    :raises configparser.Error: when the file exists, but there are parsing errors.
+    """
+    global config
 
-    def __default_config(self):
-        """
-        Creates a new instantshare.conf file from res/instantshare.default,
-        replacing all config variables like $SCREENSHOT_TOOL.
-        """
-        with open(Config._default) as _in, open(Config._file, "w") as _out:
-            content = _in.read()
-            replace = self.__dynamic_defaults()
-            for key in replace.keys():
-                content = content.replace(key, replace[key])
-            _out.write(content)
-        self.read()
+    if not path.isfile(file) or path.getsize(file) == 0:
+        raise IOError
 
-    def read(self):
-        try:
-            if not path.isfile(self._file) or path.getsize(self._file) == 0:
-                raise IOError
-            super().read([self._file])
-        except IOError as e:
-            # No config file, create one with default values
-            self.__default_config()
+    parser = ConfigParser()
+    parser.read(file)
+    for section in parser.sections():
+        config[section] = dict(parser.items(section))
+    return config
 
-    def write(self):
-        with open(self._file, mode='w') as fp:
-            super().write(fp)
 
-CONFIG = Config()
+def write(configuration: dict=config, file: str=__default_file):
+    global config
+
+    with open(file, "w") as fp:
+        config = configuration
+        parser = ConfigParser()
+        for section in config.keys():
+            for key in config[section].keys():
+                parser.set(section, key, config[section][key])
+        parser.write(fp)
+
+
+def create_instantshare_default_config():
+    with open(__default_file) as _in, open(__config_file, "w") as _out:
+        content = _in.read()
+        replace = __dynamic_defaults()
+        for key in replace.keys():
+            content = content.replace(key, replace[key])
+        _out.write(content)
+    read()
+
+if __name__ == "__main__":
+    read()
+    print("Hello, World!")

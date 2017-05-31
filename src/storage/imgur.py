@@ -3,7 +3,7 @@ import logging
 from imgurpython import ImgurClient
 from imgurpython.helpers.error import ImgurClientError
 
-from tools.config import CONFIG
+from tools.config import config, general
 from tools.oauthtool import implicit_flow
 from tools.persistence import KVStub
 
@@ -14,7 +14,7 @@ kvstore = KVStub()
 def upload(file: str) -> str:
     # Anonymous upload.
     # TODO: Upload to a specific user account. See #8.
-    client_id = CONFIG.get(_name, "client_id")
+    client_id = config[_name]["client_id"]
 
     # access_token = kvstore["access_token"]
     # refresh_token = kvstore["refresh_token"]
@@ -34,7 +34,7 @@ def upload(file: str) -> str:
 def _authorize():
     # For issue #8
     authorization_endpoint = "https://api.imgur.com/oauth2/authorize"
-    client_id = CONFIG.get(_name, "client_id")
+    client_id = config[_name]["client_id"]
 
     # Start OAuth2 implicit flow
     auth_response = implicit_flow(authorization_endpoint, client_id)

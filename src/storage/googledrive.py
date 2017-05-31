@@ -7,7 +7,7 @@ from googleapiclient import errors
 from googleapiclient.http import MediaFileUpload
 from oauth2client.client import AccessTokenCredentials
 
-from tools.config import CONFIG
+from tools.config import config, general
 from tools.oauthtool import implicit_flow
 from tools.persistence import KVStub
 
@@ -34,7 +34,7 @@ def upload(file: str) -> str:
     # Returns a list of folders in the root directory with a title equaling the screenshot_dir
     results = service.files().list(
         q="'root' in parents and trashed=false and mimeType='application/vnd.google-apps.folder'"
-          " and title='" + CONFIG.get(CONFIG.general, "screenshot_dir") + "'",
+          " and title='" + config[general]["screenshot_dir"] + "'",
         maxResults=100
     ).execute()
     items = results.get('items', [])
@@ -42,7 +42,7 @@ def upload(file: str) -> str:
     # Checks if the directory already exists and if not it will create it
     if not items:
         folder_body = {
-            'title': CONFIG.get(CONFIG.general, "screenshot_dir"),
+            'title': config[general]["screenshot_dir"],
             'parents': ['root'],
             'mimeType': 'application/vnd.google-apps.folder'
         }
@@ -85,7 +85,7 @@ def upload(file: str) -> str:
 
 
 def _authorize():
-    app_key = CONFIG.get(_name, "app_key")
+    app_key = config[_name]["app_key"]
 
     # Start OAuth2 implicit flow
     auth_response = implicit_flow(AUTHORIZATION_ENDPOINT, app_key, scope=[SCOPES])

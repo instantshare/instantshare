@@ -4,17 +4,17 @@ import sys
 
 import paramiko
 
-from tools.config import CONFIG
+from tools.config import config, general
 from tools.persistence import KVStub
 
 _name = "sftp"
 kvstore = KVStub()
 
 # Load SFTP server info from config file
-HOSTNAME = CONFIG.get(_name, "hostname")
-PORT = CONFIG.getint(_name, "port")
-AUTHENTICATION_TYPE = CONFIG.get(_name, "authentication_type")
-SFTP_BASE_DIR = CONFIG.get(_name, "base_dir")
+HOSTNAME = config[_name]["hostname"]
+PORT = int(config[_name]["port"])  # TODO type checking
+AUTHENTICATION_TYPE = config[_name]["authentication_type"]
+SFTP_BASE_DIR = config[_name]["base_dir"]
 
 
 # The provided user for SFTP upload must have read and write permissions in the SFTP_BASE_DIR
@@ -32,7 +32,7 @@ def upload(file: str):
             "Can not change into base directory. Please provide a working base directory in your SFTP configuration.")
         sys.exit(0)
 
-    screenshot_dir = CONFIG.get(CONFIG.general, "screenshot_dir")
+    screenshot_dir = config[general]["screenshot_dir"]
     sftp_filepath = screenshot_dir + "/" + ntpath.basename(file)
 
     _create_dir_if_not_exists(screenshot_dir, sftp_client)
@@ -87,7 +87,7 @@ def _connect():
                 transport.connect(username=kvstore["username"], password=kvstore["password"])
                 break
             elif AUTHENTICATION_TYPE == "key":
-                key_filepath = CONFIG.get(_name, "key_filepath")
+                key_filepath = config[_name]["key_filepath"]
                 private_key = paramiko.RSAKey.from_private_key_file(key_filepath, kvstore["key passphrase"])
                 transport.connect(username=kvstore["username"], pkey=private_key)
                 break

@@ -29,6 +29,12 @@ import logging
 __commands__ = ["screen", "text", "video", "audio", "file", "gui"]
 
 
+def _setup_config():
+    # TODO Error handling
+    import tools.config
+    tools.config.read()
+
+
 def _setup_logging(level=logging.INFO, file=False):
     fmtstr = "%(asctime)s\t%(levelname)s:\t%(message)s"
     if file:
@@ -58,6 +64,7 @@ def execute_command(cmd: str):
 
 
 def main():
+    _setup_config()
     _setup_logging(file=False)
 
     # TODO access centralized version information

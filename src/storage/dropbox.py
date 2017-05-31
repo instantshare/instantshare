@@ -4,7 +4,7 @@ import ntpath
 import dropbox
 from dropbox.files import WriteMode
 
-from tools.config import CONFIG
+from tools.config import config, general
 from tools.oauthtool import implicit_flow
 from tools.persistence import KVStub
 
@@ -22,7 +22,7 @@ def upload(file: str) -> str:
 
     token = kvstore["access_token"]
     dropbox_client = dropbox.Dropbox(token)
-    dropbox_filepath = "/" + CONFIG.get(CONFIG.general, "screenshot_dir") + "/" + ntpath.basename(file)
+    dropbox_filepath = "/" + config[general]["screenshot_dir"] + "/" + ntpath.basename(file)
     file_object = open(file, 'rb')
 
     try:
@@ -49,7 +49,7 @@ def upload(file: str) -> str:
 
 def _authorize():
     authorization_endpoint = "https://www.dropbox.com/oauth2/authorize"
-    app_key = CONFIG.get(_name, "app_key")
+    app_key = config[_name]["app_key"]
 
     # Start OAuth2 implicit flow
     auth_response = implicit_flow(authorization_endpoint, app_key)
