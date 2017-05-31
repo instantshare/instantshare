@@ -12,7 +12,7 @@ kvstore = KVStub()
 
 # Load SFTP server info from config file
 HOSTNAME = config[_name]["hostname"]
-PORT = int(config[_name]["port"])  # TODO type checking
+PORT = config[_name]["port"]
 AUTHENTICATION_TYPE = config[_name]["authentication_type"]
 SFTP_BASE_DIR = config[_name]["base_dir"]
 

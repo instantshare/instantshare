@@ -2,6 +2,7 @@ from configparser import ConfigParser
 from os import path
 
 import tools.dirs as dirs
+from tools.toolbox import deserialize
 
 config = {}
 general = "General"
@@ -38,6 +39,8 @@ def read(file: str=__config_file) -> dict:
     parser.read(file)
     for section in parser.sections():
         config[section] = dict(parser.items(section))
+        for key in config[section].keys():
+            config[section][key] = deserialize(config[section][key])
     return config
 
 
@@ -61,7 +64,3 @@ def create_instantshare_default_config():
             content = content.replace(key, replace[key])
         _out.write(content)
     read()
-
-if __name__ == "__main__":
-    read()
-    print("Hello, World!")

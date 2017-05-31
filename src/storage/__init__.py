@@ -94,7 +94,7 @@ def _hoster_for(media_type: str):
 
 
 def _upload(hoster, path):
-    play_sounds = bool(config[general]["notification_sound"])  # TODO type checking
+    play_sounds = config[general]["notification_sound"]
 
     # upload to storage
     try:
@@ -110,7 +110,7 @@ def _upload(hoster, path):
     logging.info("Uploaded file to: " + url)
 
     # execute user defined action
-    if bool(config[general]["cb_autocopy"]):  # TODO type checking
+    if config[general]["cb_autocopy"]:
         import tools.clipboard as c
         c.Clipboard().set(url)
     else:

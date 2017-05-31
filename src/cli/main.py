@@ -30,9 +30,15 @@ __commands__ = ["screen", "text", "video", "audio", "file", "gui"]
 
 
 def _setup_config():
-    # TODO Error handling
     import tools.config
-    tools.config.read()
+    import configparser
+    try:
+        tools.config.read()
+    except IOError:
+        tools.config.create_instantshare_default_config()
+    except configparser.ParsingError as e:
+        print("There are errors in your configuration: " + e.message)
+        sys.exit(1)
 
 
 def _setup_logging(level=logging.INFO, file=False):
