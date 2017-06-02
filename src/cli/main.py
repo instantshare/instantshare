@@ -74,7 +74,7 @@ def main():
     _setup_logging(file=False)
 
     # TODO access centralized version information
-    args = docopt(__doc__, options_first=True, version="instantshare version 0.1")
+    args = docopt(__doc__, options_first=True, version="instantshare version 0.2")
     if args["<command>"] == "help":
         if len(args["<args>"]) == 0:
             print(printable_usage(__doc__), file=sys.stderr)
