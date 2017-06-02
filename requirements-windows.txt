@@ -1,3 +1,4 @@
 -r requirements.txt
 pypiwin32
 pyhooked
+win10toast
