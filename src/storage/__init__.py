@@ -102,7 +102,7 @@ def _upload(hoster, path):
         if url is None:
             raise Exception
     except Exception as e:
-        logging.error("Error occured while uploading file to hoster:\n" + e)
+        logging.error("Error occured while uploading file to hoster:\n" + str(e))
         if play_sounds:
             import tools.audio as a
             a.play_wave_file(dirs.res + "/error.wav")
