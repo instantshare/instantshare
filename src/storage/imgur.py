@@ -1,4 +1,5 @@
 import logging
+from time import time
 
 from imgurpython import ImgurClient
 from imgurpython.helpers.error import ImgurClientError
@@ -12,27 +13,30 @@ kvstore = KVStub()
 
 
 def upload(file: str) -> str:
-    # Anonymous upload.
-    # TODO: Upload to a specific user account. See #8.
     client_id = config[_name]["client_id"]
+    if "access_token" not in kvstore.keys() or "refresh_token" not in kvstore.keys():
+        if not _authorize():
+            return None  # unable to authorize
 
-    # access_token = kvstore["access_token"]
-    # refresh_token = kvstore["refresh_token"]
-
-    imgur_client = ImgurClient(client_id, None, None, None)
-
+    imgur_client = ImgurClient(client_id, None, kvstore["access_token"], kvstore["refresh_token"])
     file_metadata = None
-    try:
-        file_metadata = imgur_client.upload_from_path(file)
-    except ImgurClientError as e:
-        logging.error("Upload failed. Error message: {0}".format(e.error_message))
+
+    while True:
+        try:
+            file_metadata = imgur_client.upload_from_path(file, anon=False)
+            break
+        except ImgurClientError as e:
+            if e.status_code == 400 and _authorize():
+                imgur_client.set_user_auth(kvstore["access_token"], kvstore["refresh_token"])
+            else:
+                logging.error("Upload failed. Error message: {0}".format(e.error_message))
+                return None
 
     url = file_metadata["link"] if file_metadata else None
     return url
 
 
 def _authorize():
-    # For issue #8
     authorization_endpoint = "https://api.imgur.com/oauth2/authorize"
     client_id = config[_name]["client_id"]
 
@@ -46,7 +50,7 @@ def _authorize():
 
     kvstore["access_token"] = auth_response["access_token"]
     kvstore["refresh_token"] = auth_response["refresh_token"]
-    kvstore["expires_in"] = auth_response["expires_in"]
+    kvstore["expires"] = int(time()) + int(auth_response["expires_in"])
     kvstore.sync()
 
     return True
