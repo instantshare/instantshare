@@ -1,6 +1,7 @@
-from time import sleep
+import re
 from abc import ABCMeta, abstractmethod
 from sys import platform as _platform
+from time import sleep
 
 
 def delay_execution(t, fn):
@@ -32,3 +33,19 @@ class Platform(metaclass=ABCMeta):
             raise OSError("Platform not supported!")
         else:
             init_functions[_platform]()
+
+typemap = {
+    re.compile(r"True|true|yes|on|False|false|no|off"):
+        lambda x: True if x in ("True", "true", "yes", "on") else False,
+    re.compile(r"(?:\+|-)?[0-9]+"):
+        lambda x: int(x),
+    re.compile(r"(?:\+|-)?[0-9]*\.[0-9]+"):
+        lambda x: float(x),
+}
+
+
+def deserialize(text: str):
+    for rx in typemap.keys():
+        if rx.fullmatch(text):
+            return typemap[rx](text)
+    return text

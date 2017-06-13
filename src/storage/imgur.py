@@ -4,7 +4,7 @@ from time import time
 from imgurpython import ImgurClient
 from imgurpython.helpers.error import ImgurClientError
 
-from tools.config import CONFIG
+from tools.config import config, general
 from tools.oauthtool import implicit_flow
 from tools.persistence import KVStub
 
@@ -13,7 +13,7 @@ kvstore = KVStub()
 
 
 def upload(file: str) -> str:
-    client_id = CONFIG.get(_name, "client_id")
+    client_id = config[_name]["client_id"]
     if "access_token" not in kvstore.keys() or "refresh_token" not in kvstore.keys():
         if not _authorize():
             return None  # unable to authorize
@@ -38,7 +38,7 @@ def upload(file: str) -> str:
 
 def _authorize():
     authorization_endpoint = "https://api.imgur.com/oauth2/authorize"
-    client_id = CONFIG.get(_name, "client_id")
+    client_id = config[_name]["client_id"]
 
     # Start OAuth2 implicit flow
     auth_response = implicit_flow(authorization_endpoint, client_id)

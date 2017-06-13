@@ -29,6 +29,18 @@ import logging
 __commands__ = ["screen", "text", "video", "audio", "file", "gui"]
 
 
+def _setup_config():
+    import tools.config
+    import configparser
+    try:
+        tools.config.read()
+    except IOError:
+        tools.config.create_instantshare_default_config()
+    except configparser.ParsingError as e:
+        print("There are errors in your configuration: " + e.message)
+        sys.exit(1)
+
+
 def _setup_logging(level=logging.INFO, file=False):
     fmtstr = "%(asctime)s\t%(levelname)s:\t%(message)s"
     if file:
@@ -58,6 +70,7 @@ def execute_command(cmd: str):
 
 
 def main():
+    _setup_config()
     _setup_logging(file=False)
 
     # TODO access centralized version information

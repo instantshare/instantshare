@@ -1,23 +1,18 @@
 ============
 instantshare
 ============
-Takes screenshots and instantly uploads them to Imgur, Dropbox, Google Drive, ownCloud or even your own SFTP enabled server.
-As soon as the upload is done, the public URL will be copied to your clipboard and you will get a notification to let you know you can start sharing the screenshot with your friends!
+Instantshare allows you to create media on the fly and upload them to Imgur, Dropbox, Google Drive, ownCloud or even your own server (using SFTP).
+As soon as the upload is done, the public URL will be copied to your clipboard and you will get a notification to let you know that you can start sharing your screenshot, paste, voice message or regular file with your friends!
 
 Online storage providers possibly to be added in the future:
 
 - FTP Servers
+- Nextcloud
 - ... submit your favorite storage provider request via issue or implementation via pull request!
 
-At a later point, we would also like to enable you to share other types of media:
+At a later point, we would also like to enable you to share video recorded from your desktop (possibly WebM).
 
-- plain text
-- any type of file
-- audio from a microphone (Opus)
-- recorded video (WebM)
-
-If you find any bugs, please keep in mind that we are still in a very early stage of development.
-But if you think that you've got something helpful to add, you are welcome to create a bug report on the `issue tracker`_.
+If you find any bugs or if you feel like you've got something helpful to add, you are welcome to contact us on the `issue tracker`_.
 
 Installation
 ============
@@ -45,7 +40,7 @@ Linux
 -----
 - Python 3.5 (``python``) and pip (``python-pip``) should come with your distro
 - If not, install them using your package manager
-- Install ``gnome-screenshot`` and ``xclip`` using your package manager
+- Install using your distro's package manager: ``gnome-screenshot`` ``xclip`` ``python-tk``
 - Install the dependencies using pip:
 
 .. code-block:: bash
@@ -58,13 +53,13 @@ If you installed all the dependencies correctly, running the app should be as si
 
 ::
 
-    > python C:\path\to\instantshare.py
+    > python C:\path\to\src\instantshare
 
 on Windows or
 
 .. code-block:: bash
 
-    $ path/to/instantshare.py
+    $ path/to/src/instantshare
 
 on Linux, replacing the path with the actual location of the file.
 
