@@ -1,13 +1,13 @@
 from urllib import request, parse
 
-from tools.config import CONFIG
+from tools.config import config, general
 
 _name = "pastebin"
 
 
 def upload(file: str) -> str:
     data = {
-        "api_dev_key": CONFIG.get(_name, "app_key"),
+        "api_dev_key": config[_name]["app_key"],
         "api_option": "paste",
         "api_paste_code": open(file, "r").read()
     }

@@ -3,7 +3,7 @@ import ntpath
 
 import owncloud
 
-from tools.config import CONFIG
+from tools.config import config, general
 from tools.persistence import KVStub
 
 _name = "owncloud"
@@ -11,14 +11,14 @@ kvstore = KVStub()
 
 
 def upload(file: str) -> str:
-    owncloud_url = CONFIG.get(_name, "url")
+    owncloud_url = config[_name]["url"]
     oc = owncloud.Client(owncloud_url)
 
     if not _login(oc):
         return
 
     # find or create screenshot directory
-    dir = CONFIG.get(CONFIG.general, "screenshot_dir")
+    dir = config[general]["screenshot_dir"]
     try:
         oc.mkdir(dir)
     except:

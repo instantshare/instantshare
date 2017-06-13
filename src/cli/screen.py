@@ -17,14 +17,14 @@ from docopt import docopt
 
 import storage
 from tools import dirs
-from tools.config import CONFIG
+from tools.config import config, general
 
 
 def main(argv):
     args = docopt(__doc__, argv=argv)
 
     # import modules dynamically
-    scrtool_str = args["--tool"] if args["--tool"] else CONFIG.get(CONFIG.general, "screenshot_tool")
+    scrtool_str = args["--tool"] if args["--tool"] else config[general]["screenshot_tool"]
     scrtool = import_module("screenshot." + scrtool_str)
 
     # build filename

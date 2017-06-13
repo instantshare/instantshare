@@ -1,12 +1,12 @@
-import getpass
 import logging
+import getpass
 from importlib import import_module
 
 import keyring
 
 from gui.dialogs import text_input
 from tools import dirs
-from tools.config import CONFIG
+from tools.config import config, general
 from tools.encryption import CryptoError
 from tools.persistence import KVStore, PersistentDataEncryptedError
 
@@ -36,7 +36,7 @@ def upload_to(hoster: str, path: str):
 
 
 def _load_persistent_data(module: str):
-    encryption = CONFIG.get(CONFIG.general, "encryption")
+    encryption = config[general]["encryption"]
     if encryption == "password":
         pw = text_input("Encryption password", "Please enter your encryption password:", hidden=True)
         while True:
@@ -64,8 +64,8 @@ def _load_persistent_data(module: str):
             return KVStore(module)
         except PersistentDataEncryptedError:
             pw = text_input("Encryption Password",
-                            "Please enter your previous encryption password (one last time):",
-                            hidden=True)
+                              "Please enter your previous encryption password (one last time):",
+                              hidden=True)
             while True:
                 try:
                     kvs = KVStore(module, pw, unlock=True)
@@ -89,12 +89,12 @@ def _hoster_called(name: str):
 
 
 def _hoster_for(media_type: str):
-    return _hoster_called(CONFIG.get(CONFIG.general, "storage_" + media_type))
+    return _hoster_called(config[general]["storage_" + media_type])
 
 
 def _upload(hoster, path):
-    play_sounds = CONFIG.getboolean(CONFIG.general, "notification_sound")
-    show_notifications = CONFIG.getboolean(CONFIG.general, "notification_toast")
+    play_sounds = config[general]["notification_sound"]
+    show_notifications = config[general]["notification_toast"]
 
     # upload to storage
     try:
@@ -114,7 +114,7 @@ def _upload(hoster, path):
     logging.info("Uploaded file to: " + url)
 
     # execute user defined action
-    if CONFIG.getboolean(CONFIG.general, "cb_autocopy"):
+    if config[general]["cb_autocopy"]:
         import tools.clipboard as c
         c.Clipboard().set(url)
     else:
@@ -125,7 +125,3 @@ def _upload(hoster, path):
     if play_sounds:
         import tools.audio as a
         a.play_wave_file(dirs.res + "/notification.wav")
-    if show_notifications:
-        from tools.toast import Toast
-        t = Toast()
-        t.show("Upload Finished", "Media upload was successful.")

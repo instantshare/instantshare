@@ -18,7 +18,7 @@ from docopt import docopt
 
 from cli.main import execute_command
 from gui.traymenu import Tray
-from tools.config import CONFIG
+from tools.config import config
 from tools.hotkey import Hotkey, HotkeyInUseError, InvalidHotkeyError
 from tools.toolbox import delay_execution
 
@@ -45,7 +45,7 @@ def main(argv):
     hotkey_daemon = Hotkey(event_queue)
     for hotkey_option, callback in hotkey_options_with_callbacks.items():
         try:
-            hotkey = CONFIG.get("hotkeys", hotkey_option).split("+")
+            hotkey = config["hotkeys"][hotkey_option].split("+")
             hotkey_daemon.add_hotkey(hotkey, callback)
         except (HotkeyInUseError, InvalidHotkeyError) as e:
             logging.warning(e.error_msg)
