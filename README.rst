@@ -47,9 +47,28 @@ Linux
 
     $ pip install -r requirements-linux.txt
 
+Optional: Build an executable file
+----------------------------------
+We use PyInstaller for building the app into an executable file. We already provide a PyInstaller specification file, so building comes down to the following steps:
+
+- Install PyInstaller using pip
+
+.. code-block:: bash
+
+    $ pip install PyInstaller
+
+- Run PyInstaller with the provided specification file in project root directory
+
+.. code-block:: bash
+
+    $ pyinstaller instantshare.spec
+
+PyInstaller creates a build directory containing temporary files and a dist directory containing the executable application.
+
 Run the app
 ===========
-If you installed all the dependencies correctly, running the app should be as simple as typing:
+If you build the app beforehand, running the app is as simple as running the executable file in the new `dist` folder.
+If you skipped the optional build, you can still run the app like this:
 
 ::
 
