@@ -21,8 +21,7 @@ hidden_imports = ['cli.audio',
 
 added_files = [('src/res', 'res')]
 
-a = Analysis(['src\\instantshare'],
-             pathex=['C:\\Developer\\instantshare'],
+a = Analysis(['src/instantshare'],
              binaries=[],
              datas=added_files,
              hiddenimports=hidden_imports,
