@@ -125,3 +125,7 @@ def _upload(hoster, path):
     if play_sounds:
         import tools.audio as a
         a.play_wave_file(dirs.res + "/notification.wav")
+    if show_notifications:
+        from tools.toast import Toast
+        t = Toast()
+        t.show("Upload Finished", "Media upload was successful.")
