@@ -45,4 +45,16 @@ class Clipboard(Platform):
         self.get = g
 
     def init_osx(self):
-        pass
+        def s(data):
+            p = Popen("pbcopy", stdin=PIPE).communicate(input=bytes(data, encoding="utf-8"))
+
+        def g():
+            p = Popen("pbpaste", stdout=PIPE, stderr=PIPE)
+            out, err = p.communicate()
+            if out is None:
+                raise OSError(err)
+            else:
+                return str(out, encoding="utf-8")
+
+        self.set = s
+        self.get = g
