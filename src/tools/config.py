@@ -22,6 +22,8 @@ def __dynamic_defaults():
         return {"$SCREENSHOT_TOOL": "gnome_screenshot"}
     elif platform == "win32":
         return {"$SCREENSHOT_TOOL": "windows_tk"}
+    elif platform == "darwin":
+        return {"$SCREENSHOT_TOOL": "macos_screenshot"}
 
 
 def read(file: str=__config_file) -> dict:
