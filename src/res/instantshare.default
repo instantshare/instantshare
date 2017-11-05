@@ -37,6 +37,11 @@ screenshot_dir = Screenshots
 # Possible Values: windows_tk (Windows only), snippingtool (Windows 10 Creators Update only), gnome_screenshot (Linux only)
 screenshot_tool = $SCREENSHOT_TOOL
 
+# How (or if at all) to shorten obtained public URLs to the uploaded medium.
+# Possible Values: tinyurl
+# Any other setting will lead to URLs not being shortened.
+url_shortener = None
+
 # Whether or not to automatically copy the public URL to the uploaded medium to the clipboard.
 # When not copied to the clipboard, the URL will be opened in the web browser.
 # Possible Values: True, False
