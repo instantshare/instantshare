@@ -32,4 +32,11 @@ class Toast(Platform):
         self.show = s
 
     def init_osx(self):
-        pass
+        # AppleScript language doesn't support specifying an icon or a timeout value
+        def show(title, message):
+            import os
+            os.system("""
+                          osascript -e 'display notification "{}" with title "{}"'
+                          """.format(message, title))
+
+        self.show = show
