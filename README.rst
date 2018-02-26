@@ -16,8 +16,8 @@ If you find any bugs or if you feel like you've got something helpful to add, yo
 
 Installation
 ============
-At this point, the supported platforms are Microsoft Windows and GNU/Linux.
-We might consider adding Mac OSX support at some point in the future.
+At this point, the supported platforms are Microsoft Windows and GNU/Linux. MacOS support is being worked on with rudimentary
+support for taking screenshots already implemented.
 
 Currently, we do not ship any binaries or packages, but you can download_ and extract the sources.
 Or just clone the repository to any directory using
