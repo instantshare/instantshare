@@ -1,3 +1,4 @@
+import logging
 from abc import abstractmethod, ABCMeta
 from urllib import request
 
@@ -6,6 +7,9 @@ class UrlShortener(metaclass=ABCMeta):
     @abstractmethod
     def shorten(self, url: str) -> str:
         pass
+
+    def log(self, url):
+        logging.info("Short URL: {}".format(url))
 
 
 class Off(UrlShortener):
@@ -16,7 +20,9 @@ class Off(UrlShortener):
 class TinyURL(UrlShortener):
     def shorten(self, url: str) -> str:
         response = request.urlopen("http://tinyurl.com/api-create.php?url={}".format(url))
-        return str(response.read(), encoding="ascii")
+        url = str(response.read(), encoding="ascii")
+        self.log(url)
+        return url
 
 
 def get_url_shortener(name: str) -> UrlShortener:
