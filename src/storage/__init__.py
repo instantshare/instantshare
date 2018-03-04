@@ -9,6 +9,7 @@ from tools import dirs
 from tools.config import config, general
 from tools.encryption import CryptoError
 from tools.persistence import KVStore, PersistentDataEncryptedError
+from tools.shorturl import get_url_shortener
 
 
 def upload_generic_file(path: str):
@@ -112,6 +113,10 @@ def _upload(hoster, path):
             t.show("Error", "Failed to upload media.")
         return
     logging.info("Uploaded file to: " + url)
+
+    # shorten URL as defined in config
+    url_shortener = get_url_shortener(config[general]["url_shortener"])
+    url = url_shortener.shorten(url)
 
     # execute user defined action
     if config[general]["cb_autocopy"]:
